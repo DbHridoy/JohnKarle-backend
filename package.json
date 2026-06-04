@@ -1,0 +1,74 @@
+{
+  "name": "john-karle-backend",
+  "version": "1.0.0",
+  "description": "John Karle backend API",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "dev:watch": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "Hridoy",
+  "license": "ISC",
+  "packageManager": "pnpm@10.21.0",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1057.0",
+    "bcrypt": "^6.0.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "envalid": "^8.1.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.2",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.7",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "pino-pretty": "^13.1.3",
+    "tsx": "^4.21.0",
+    "uuid": "^14.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.6.2",
+    "@types/nodemailer": "^8.0.0",
+    "@types/supertest": "^7.2.0",
+    "eslint": "^10.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.4",
+    "prettier": "^3.8.3",
+    "supertest": "^7.2.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
+    "vitest": "^4.1.5"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.ts": [
+      "eslint --fix"
+    ]
+  }
+}
