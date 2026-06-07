@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import { ZodError } from "zod";
 
 import { env } from "../config/env.config.js";
-import { ApiError } from "../utils/api-error.js";
-import { logger } from "../utils/logger.js";
+import { ApiError } from "../utils/api-error.util.js";
+import { logger } from "../utils/logger.util.js";
 
 type MongoDuplicateKeyError = Error & {
   code?: number;

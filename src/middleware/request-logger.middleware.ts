@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 
-import { logger } from "../utils/logger.js";
+import { logger } from "../utils/logger.util.js";
 
 const MAX_LOG_BODY_LENGTH = 10_000;
 const MAX_LOG_DEPTH = 5;

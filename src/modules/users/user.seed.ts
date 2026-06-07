@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 
 import { env } from "../../config/env.config.js";
-import { logger } from "../../utils/logger.js";
+import { logger } from "../../utils/logger.util.js";
 import { UserModel } from "./user.model.js";
 
 export const ensureSuperAdmin = async (): Promise<void> => {
