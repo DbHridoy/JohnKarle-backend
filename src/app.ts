@@ -7,7 +7,7 @@ import helmet from "helmet";
 import { env } from "./config/env.config.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
-import { requestLogger } from "./middleware/requestLogger.js";
+import { requestLogger } from "./middleware/request-logger.middleware.js";
 
 const parseCorsOrigin = (value: string): CorsOptions["origin"] => {
   if (value === "*") {

@@ -1,6 +1,6 @@
 import { Router, type Router as ExpressRouter } from "express";
 
-import { validateRequest } from "../../middleware/validate-request.js";
+import { validateRequest } from "../../middleware/validate-request.middleware.js";
 import * as authController from "./auth.controller.js";
 import { authenticate } from "./auth.middleware.js";
 import { loginBodySchema, refreshBodySchema, registerBodySchema } from "./auth.validation.js";
