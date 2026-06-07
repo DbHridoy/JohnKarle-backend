@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 import { env } from "./env.config.js";
-import { logger } from "../utils/logger.js";
+import { logger } from "../utils/logger.util.js";
 
 export const connectDatabase = async (): Promise<void> => {
   mongoose.set("strictQuery", true);

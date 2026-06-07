@@ -1,7 +1,7 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 
 import { env } from "../../config/env.config.js";
-import { ApiError } from "../../utils/api-error.js";
+import { ApiError } from "../../utils/api-error.util.js";
 import type { AuthenticatedUser, AuthTokens, JwtPayload, TokenType } from "./auth.types.js";
 
 type TokenSubject = Pick<AuthenticatedUser, "id" | "email" | "role" | "tokenVersion">;

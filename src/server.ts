@@ -2,7 +2,7 @@ import { app } from "./app.js";
 import { env } from "./config/env.config.js";
 import { connectDatabase, disconnectDatabase } from "@/config/db.config.js";
 import { ensureSuperAdmin } from "./modules/users/user.seed.js";
-import { logger } from "./utils/logger.js";
+import { logger } from "./utils/logger.util.js";
 
 const startServer = async (): Promise<void> => {
   await connectDatabase();

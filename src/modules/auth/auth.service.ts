@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 
 import { env } from "../../config/env.config.js";
-import { ApiError } from "../../utils/api-error.js";
+import { ApiError } from "../../utils/api-error.util.js";
 import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { createAuthTokens, verifyToken } from "./auth.tokens.js";

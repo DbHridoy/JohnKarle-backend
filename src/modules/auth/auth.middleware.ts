@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
-import { ApiError } from "../../utils/api-error.js";
-import { asyncHandler } from "../../utils/async-handler.js";
+import { ApiError } from "../../utils/api-error.util.js";
+import { asyncHandler } from "../../utils/async-handler.util.js";
 import { UserModel } from "../users/user.model.js";
 import type { UserRole } from "../users/user.types.js";
 import { verifyToken } from "./auth.tokens.js";

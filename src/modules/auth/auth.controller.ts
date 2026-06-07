@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
-import { ApiError } from "../../utils/api-error.js";
-import { asyncHandler } from "../../utils/async-handler.js";
+import { ApiError } from "../../utils/api-error.util.js";
+import { asyncHandler } from "../../utils/async-handler.util.js";
 import * as authService from "./auth.service.js";
 
 export const register: RequestHandler = asyncHandler(async (req, res) => {
