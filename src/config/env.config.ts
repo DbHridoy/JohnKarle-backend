@@ -21,6 +21,10 @@ export const env = cleanEnv(process.env, {
   SUPER_ADMIN_EMAIL: str({ default: "" }),
   SUPER_ADMIN_PASSWORD: str({ default: "" }),
   SMTP_SECURE: bool({ default: false }),
+  OUTLOOK_EMAIL: str({ default: "" }),
+  OUTLOOK_PASSWORD: str({ default: "" }),
+  PASSWORD_RESET_CODE_EXPIRES_MINUTES: num({ default: 10 }),
+  PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: num({ default: 15 }),
 });
 
 if (env.NODE_ENV === "production" && env.JWT_SECRET === developmentJwtSecret) {
