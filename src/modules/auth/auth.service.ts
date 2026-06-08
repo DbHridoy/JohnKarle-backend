@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import crypto from "node:crypto";
 import { randomInt, randomUUID } from "node:crypto";
-import nodemailer from "nodemailer";
 
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
+import { getMailTransporter } from "../../utils/mail.util.js";
 import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { createAuthTokens, verifyToken } from "./auth.tokens.js";
@@ -35,33 +35,6 @@ const passwordResetTokenError = new ApiError(
   "Password reset session is invalid or expired.",
   "INVALID_PASSWORD_RESET_TOKEN",
 );
-
-let transporter: nodemailer.Transporter | null = null;
-
-const getMailTransporter = (): nodemailer.Transporter => {
-  if (transporter) {
-    return transporter;
-  }
-
-  if (!env.OUTLOOK_EMAIL || !env.OUTLOOK_PASSWORD) {
-    throw new ApiError(
-      500,
-      "Outlook mail credentials are not configured.",
-      "MAIL_CONFIGURATION_ERROR",
-    );
-  }
-
-  transporter = nodemailer.createTransport({
-    service: "outlook",
-    secure: env.SMTP_SECURE,
-    auth: {
-      user: env.OUTLOOK_EMAIL,
-      pass: env.OUTLOOK_PASSWORD,
-    },
-  });
-
-  return transporter;
-};
 
 const hashSecret = (value: string): string =>
   crypto.createHash("sha256").update(value).digest("hex");
@@ -128,10 +101,20 @@ export const register = async (input: RegisterInput): Promise<AuthResponse> => {
 
 export const login = async (input: LoginInput): Promise<AuthResponse> => {
   const email = input.email.trim().toLowerCase();
-  const user = await UserModel.findOne({ email }).select("+passwordHash").exec();
+  const user = await UserModel.findOne({ email })
+    .select("+passwordHash +invitationTokenHash +invitationExpiresAt")
+    .exec();
 
   if (!user) {
     throw invalidCredentialsError;
+  }
+
+  if (user.invitationTokenHash) {
+    if (user.invitationExpiresAt && user.invitationExpiresAt.getTime() < Date.now()) {
+      throw new ApiError(400, "Invitation has expired.", "INVITATION_EXPIRED");
+    }
+
+    throw new ApiError(403, "Invitation must be accepted before login.", "INVITATION_PENDING");
   }
 
   const passwordMatches = await bcrypt.compare(input.password, user.passwordHash);
