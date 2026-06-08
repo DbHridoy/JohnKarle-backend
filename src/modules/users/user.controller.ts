@@ -24,6 +24,25 @@ export const getProfile: RequestHandler = asyncHandler(async (req, res) => {
   });
 });
 
+export const createInvitation: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const result = await userService.createInvitation(user, req.body);
+
+  res.status(201).json({
+    success: true,
+    data: result,
+  });
+});
+
+export const acceptInvitation: RequestHandler = asyncHandler(async (req, res) => {
+  const result = await userService.acceptInvitation(req.body);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
 export const updateProfile: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
   const profile = await userService.updateProfile(user, req.body, req.file);
