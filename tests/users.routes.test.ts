@@ -10,8 +10,36 @@ const { createApp } = await import("../src/app.js");
 const app = createApp();
 
 describe("user profile routes", () => {
+  it("validates invitation acceptance payloads", async () => {
+    const response = await request(app).post("/api/v1/users/invitations/accept").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+      },
+    });
+  });
+
   it("requires an access token to fetch the current profile", async () => {
     const response = await request(app).get("/api/v1/users/profile");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "AUTH_REQUIRED",
+      },
+    });
+  });
+
+  it("requires an access token to create an invitation", async () => {
+    const response = await request(app).post("/api/v1/users/invitations").send({
+      name: "Jane Doe",
+      email: "jane@example.com",
+      role: "editor",
+    });
 
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
