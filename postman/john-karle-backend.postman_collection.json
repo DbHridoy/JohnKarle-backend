@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "d9d0f1d1-5e7b-4f5b-9fd7-30d018f8f81d",
     "name": "John Karle Backend API",
-    "description": "Postman collection for the John Karle backend. Import the collection, update the collection variables as needed, then run Health Check, Register or Login, and the authenticated requests.",
+    "description": "Postman collection for the John Karle backend.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -10,7 +10,7 @@
       "name": "System",
       "item": [
         {
-          "name": "Health Check",
+          "name": "Root Health",
           "request": {
             "method": "GET",
             "header": [
@@ -19,33 +19,61 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
-            },
-            "description": "Checks whether the API process is running."
+            "url": "{{serverUrl}}/health",
+            "description": "Checks whether the root API process is running."
           },
-          "event": [
+          "response": [
             {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('health check succeeds', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('service reports ok', function () {",
-                  "  var json = pm.response.json();",
-                  "  pm.expect(json.success).to.eql(true);",
-                  "  pm.expect(json.data.status).to.eql('ok');",
-                  "});"
-                ]
-              }
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{serverUrl}}/health"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
             }
-          ],
-          "response": []
+          ]
+        },
+        {
+          "name": "API v1 Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/health",
+            "description": "Checks the versioned API health route."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/health"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -74,7 +102,6 @@
                   "pm.test('register succeeds', function () {",
                   "  pm.response.to.have.status(201);",
                   "});",
-                  "",
                   "var json = pm.response.json();",
                   "if (json.data && json.data.tokens) {",
                   "  pm.collectionVariables.set('accessToken', json.data.tokens.accessToken);",
@@ -100,14 +127,36 @@
               "mode": "raw",
               "raw": "{\n  \"name\": \"{{userName}}\",\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "register"]
-            },
-            "description": "Creates a user and stores returned access and refresh tokens in collection variables. Leave useUniqueRegisterEmail=true for repeatable local testing."
+            "url": "{{authBaseUrl}}/register",
+            "description": "Creates a user."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo.user@example.com\",\n  \"password\": \"ChangeMe123!\"\n}"
+                },
+                "url": "{{authBaseUrl}}/register"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Login",
@@ -120,7 +169,6 @@
                   "pm.test('login succeeds', function () {",
                   "  pm.response.to.have.status(200);",
                   "});",
-                  "",
                   "var json = pm.response.json();",
                   "if (json.data && json.data.tokens) {",
                   "  pm.collectionVariables.set('accessToken', json.data.tokens.accessToken);",
@@ -146,14 +194,36 @@
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "login"]
-            },
-            "description": "Authenticates a user and stores returned access and refresh tokens in collection variables."
+            "url": "{{authBaseUrl}}/login",
+            "description": "Authenticates a user."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"demo.user@example.com\",\n  \"password\": \"ChangeMe123!\"\n}"
+                },
+                "url": "{{authBaseUrl}}/login"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"lastLoginAt\": \"2026-06-09T00:05:00.000Z\",\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Refresh Token",
@@ -166,7 +236,6 @@
                   "pm.test('refresh succeeds', function () {",
                   "  pm.response.to.have.status(200);",
                   "});",
-                  "",
                   "var json = pm.response.json();",
                   "if (json.data && json.data.tokens) {",
                   "  pm.collectionVariables.set('accessToken', json.data.tokens.accessToken);",
@@ -192,14 +261,205 @@
               "mode": "raw",
               "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "refresh"]
-            },
-            "description": "Uses the current refresh token and replaces both auth token collection variables."
+            "url": "{{authBaseUrl}}/refresh",
+            "description": "Refreshes the token pair."
           },
-          "response": []
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"<refresh-token>\"\n}"
+                },
+                "url": "{{authBaseUrl}}/refresh"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Forgot Password",
+          "item": [
+            {
+              "name": "Request Reset Code",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{userEmail}}\"\n}"
+                },
+                "url": "{{authBaseUrl}}/forgot-password",
+                "description": "Sends a 6-digit reset code."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"email\": \"demo.user@example.com\"\n}"
+                    },
+                    "url": "{{authBaseUrl}}/forgot-password"
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"If an account exists for this email, a password reset code has been sent.\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Verify Reset Code",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('verify reset code succeeds', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "});",
+                      "var json = pm.response.json();",
+                      "if (json.data && json.data.resetToken) {",
+                      "  pm.collectionVariables.set('passwordResetToken', json.data.resetToken);",
+                      "}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"code\": \"{{passwordResetCode}}\"\n}"
+                },
+                "url": "{{authBaseUrl}}/forgot-password/verify-code",
+                "description": "Verifies the 6-digit code."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"email\": \"demo.user@example.com\",\n  \"code\": \"123456\"\n}"
+                    },
+                    "url": "{{authBaseUrl}}/forgot-password/verify-code"
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Password reset code verified successfully.\",\n    \"resetToken\": \"<reset-token>\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Reset Password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"resetToken\": \"{{passwordResetToken}}\",\n  \"password\": \"{{newUserPassword}}\",\n  \"confirmPassword\": \"{{newUserPassword}}\"\n}"
+                },
+                "url": "{{authBaseUrl}}/forgot-password/reset",
+                "description": "Resets the password."
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"email\": \"demo.user@example.com\",\n  \"resetToken\": \"<reset-token>\",\n  \"password\": \"NewPassword123!\",\n  \"confirmPassword\": \"NewPassword123!\"\n}"
+                    },
+                    "url": "{{authBaseUrl}}/forgot-password/reset"
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Password has been reset successfully.\"\n  }\n}"
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "Current User",
@@ -221,33 +481,38 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "me"]
-            },
-            "description": "Returns the profile for the current access token."
+            "url": "{{authBaseUrl}}/me",
+            "description": "Returns the current user profile."
           },
-          "event": [
+          "response": [
             {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('current user succeeds', function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('response includes user', function () {",
-                  "  var json = pm.response.json();",
-                  "  pm.expect(json.success).to.eql(true);",
-                  "  pm.expect(json.data.user.email).to.be.a('string');",
-                  "});"
-                ]
-              }
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/me"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
             }
-          ],
-          "response": []
+          ]
         },
         {
           "name": "Logout",
@@ -269,35 +534,511 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/api/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "auth", "logout"]
-            },
-            "description": "Invalidates the user's refresh token version. The API returns 204 with no body."
+            "url": "{{authBaseUrl}}/logout",
+            "description": "Invalidates the current refresh token version."
           },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/logout"
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Memory Vault",
+      "item": [
+        {
+          "name": "List Memories",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/memory-vault",
+            "description": "Lists memory vault items for the current user."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/memory-vault"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memories\": [\n      {\n        \"id\": \"507f1f77bcf86cd799439012\",\n        \"type\": \"photo\",\n        \"whoseMemoryIsThis\": \"John\",\n        \"files\": [\n          {\n            \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"originalName\": \"photo.jpg\",\n            \"mimeType\": \"image/jpeg\",\n            \"size\": 245120\n          }\n        ],\n        \"title\": \"Beach Day\",\n        \"narrative\": \"A summer memory.\",\n        \"date\": \"2026-06-09T00:00:00.000Z\",\n        \"tags\": [\"family\", \"summer\"],\n        \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Timeline",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/memory-vault/timeline",
+            "description": "Returns memories grouped by date for timeline rendering."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/memory-vault/timeline"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"timeline\": [\n      {\n        \"date\": \"2026-06-09\",\n        \"memories\": [\n          {\n            \"id\": \"507f1f77bcf86cd799439012\",\n            \"type\": \"photo\",\n            \"whoseMemoryIsThis\": \"John\",\n            \"files\": [\n              {\n                \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"originalName\": \"photo.jpg\",\n                \"mimeType\": \"image/jpeg\",\n                \"size\": 245120\n              }\n            ],\n            \"title\": \"Beach Day\",\n            \"narrative\": \"A summer memory.\",\n            \"date\": \"2026-06-09T00:00:00.000Z\",\n            \"tags\": [\"family\", \"summer\"],\n            \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n            \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Memory",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('logout succeeds', function () {",
-                  "  pm.response.to.have.status(204);",
-                  "});"
+                  "pm.test('create memory succeeds', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.memory && json.data.memory.id) {",
+                  "  pm.collectionVariables.set('memoryId', json.data.memory.id);",
+                  "}"
                 ]
               }
             }
           ],
-          "response": []
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "type",
+                  "value": "photo",
+                  "type": "text"
+                },
+                {
+                  "key": "whoseMemoryIsThis",
+                  "value": "John",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Beach Day",
+                  "type": "text"
+                },
+                {
+                  "key": "narrative",
+                  "value": "A summer memory.",
+                  "type": "text"
+                },
+                {
+                  "key": "date",
+                  "value": "2026-06-09",
+                  "type": "text"
+                },
+                {
+                  "key": "tags",
+                  "value": "family,summer",
+                  "type": "text"
+                },
+                {
+                  "key": "files",
+                  "src": "{{memoryFilePathOne}}",
+                  "type": "file"
+                },
+                {
+                  "key": "files",
+                  "src": "{{memoryFilePathTwo}}",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/memory-vault",
+            "description": "Creates a memory vault item. Use either `file` once or repeated `files` fields. `journal` may omit files."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "type",
+                      "value": "photo",
+                      "type": "text"
+                    },
+                    {
+                      "key": "whoseMemoryIsThis",
+                      "value": "John",
+                      "type": "text"
+                    },
+                    {
+                      "key": "title",
+                      "value": "Beach Day",
+                      "type": "text"
+                    },
+                    {
+                      "key": "narrative",
+                      "value": "A summer memory.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "date",
+                      "value": "2026-06-09",
+                      "type": "text"
+                    },
+                    {
+                      "key": "tags",
+                      "value": "family,summer",
+                      "type": "text"
+                    },
+                    {
+                      "key": "files",
+                      "src": "/absolute/path/to/photo.jpg",
+                      "type": "file"
+                    }
+                  ]
+                },
+                "url": "{{apiV1BaseUrl}}/memory-vault"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memory\": {\n      \"id\": \"507f1f77bcf86cd799439012\",\n      \"type\": \"photo\",\n      \"whoseMemoryIsThis\": \"John\",\n      \"files\": [\n        {\n          \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"originalName\": \"photo.jpg\",\n          \"mimeType\": \"image/jpeg\",\n          \"size\": 245120\n        }\n      ],\n      \"title\": \"Beach Day\",\n      \"narrative\": \"A summer memory.\",\n      \"date\": \"2026-06-09T00:00:00.000Z\",\n      \"tags\": [\"family\", \"summer\"],\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Memory",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}",
+            "description": "Fetches one memory vault item."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memory\": {\n      \"id\": \"507f1f77bcf86cd799439012\",\n      \"type\": \"photo\",\n      \"whoseMemoryIsThis\": \"John\",\n      \"files\": [\n        {\n          \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"originalName\": \"photo.jpg\",\n          \"mimeType\": \"image/jpeg\",\n          \"size\": 245120\n        }\n      ],\n      \"title\": \"Beach Day\",\n      \"narrative\": \"A summer memory.\",\n      \"date\": \"2026-06-09T00:00:00.000Z\",\n      \"tags\": [\"family\", \"summer\"],\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Memory",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Updated Beach Day",
+                  "type": "text"
+                },
+                {
+                  "key": "narrative",
+                  "value": "Updated story.",
+                  "type": "text"
+                },
+                {
+                  "key": "tags",
+                  "value": "family,summer,updated",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}",
+            "description": "Updates metadata. If you include files, they replace the previous S3 file set."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Updated Beach Day",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memory\": {\n      \"id\": \"507f1f77bcf86cd799439012\",\n      \"type\": \"photo\",\n      \"whoseMemoryIsThis\": \"John\",\n      \"files\": [\n        {\n          \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n          \"originalName\": \"photo.jpg\",\n          \"mimeType\": \"image/jpeg\",\n          \"size\": 245120\n        }\n      ],\n      \"title\": \"Updated Beach Day\",\n      \"narrative\": \"Updated story.\",\n      \"date\": \"2026-06-09T00:00:00.000Z\",\n      \"tags\": [\"family\", \"summer\", \"updated\"],\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:10:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Memory",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}",
+            "description": "Deletes a memory vault item and its S3 files."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/memory-vault/{{memoryId}}"
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "body": ""
+            }
+          ]
         }
       ]
     }
   ],
   "variable": [
     {
-      "key": "baseUrl",
-      "value": "http://localhost:5200",
+      "key": "serverUrl",
+      "value": "http://localhost:5100",
+      "type": "string"
+    },
+    {
+      "key": "apiV1BaseUrl",
+      "value": "{{serverUrl}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "authBaseUrl",
+      "value": "{{serverUrl}}/api/auth",
       "type": "string"
     },
     {
@@ -321,6 +1062,21 @@
       "type": "string"
     },
     {
+      "key": "newUserPassword",
+      "value": "NewPassword123!",
+      "type": "string"
+    },
+    {
+      "key": "passwordResetCode",
+      "value": "123456",
+      "type": "string"
+    },
+    {
+      "key": "passwordResetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "accessToken",
       "value": "",
       "type": "string"
@@ -328,6 +1084,21 @@
     {
       "key": "refreshToken",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memoryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memoryFilePathOne",
+      "value": "/absolute/path/to/file-one.jpg",
+      "type": "string"
+    },
+    {
+      "key": "memoryFilePathTwo",
+      "value": "/absolute/path/to/file-two.jpg",
       "type": "string"
     }
   ]
