@@ -32,6 +32,7 @@ export const env = cleanEnv(process.env, {
   }),
   AWS_ACCESS_KEY_ID: str({ default: "" }),
   AWS_SECRET_ACCESS_KEY: str({ default: "" }),
+  APP_BASE_URL: str({ default: "http://localhost:3000" }),
 });
 
 if (env.NODE_ENV === "production" && env.JWT_SECRET === developmentJwtSecret) {
