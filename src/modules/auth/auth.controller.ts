@@ -31,6 +31,33 @@ export const refresh: RequestHandler = asyncHandler(async (req, res) => {
   });
 });
 
+export const requestPasswordResetCode: RequestHandler = asyncHandler(async (req, res) => {
+  const result = await authService.requestPasswordResetCode(req.body);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+export const verifyPasswordResetCode: RequestHandler = asyncHandler(async (req, res) => {
+  const result = await authService.verifyPasswordResetCode(req.body);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+export const resetPassword: RequestHandler = asyncHandler(async (req, res) => {
+  const result = await authService.resetPassword(req.body);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
 export const me: RequestHandler = asyncHandler(async (req, res) => {
   if (!req.user) {
     throw new ApiError(401, "Authentication token is required.", "AUTH_REQUIRED");
