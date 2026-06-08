@@ -747,6 +747,124 @@
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:15:00.000Z\"\n    }\n  }\n}"
             }
           ]
+        },
+        {
+          "name": "Create Invitation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{invitedUserName}}\",\n  \"email\": \"{{invitedUserEmail}}\",\n  \"role\": \"editor\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/users/invitations",
+            "description": "Creates an invitation, emails the app link and generated password, and expires after 24 hours."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"role\": \"editor\"\n}"
+                },
+                "url": "{{apiV1BaseUrl}}/users/invitations"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitation\": {\n      \"email\": \"jane@example.com\",\n      \"expiresAt\": \"2026-06-10T00:00:00.000Z\",\n      \"role\": \"editor\"\n    },\n    \"message\": \"Invitation sent successfully.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Accept Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/users/invitations/accept",
+            "description": "Accepts an invitation token before the invited user logs in with the emailed password."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"token\": \"<invitation-token>\"\n}"
+                },
+                "url": "{{apiV1BaseUrl}}/users/invitations/accept"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"email\": \"jane@example.com\",\n    \"message\": \"Invitation accepted successfully.\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -1254,6 +1372,21 @@
     },
     {
       "key": "passwordResetToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invitedUserName",
+      "value": "Jane Doe",
+      "type": "string"
+    },
+    {
+      "key": "invitedUserEmail",
+      "value": "jane@example.com",
+      "type": "string"
+    },
+    {
+      "key": "invitationToken",
       "value": "",
       "type": "string"
     },

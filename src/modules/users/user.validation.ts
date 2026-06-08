@@ -62,4 +62,20 @@ export const updateProfileBodySchema = z
   })
   .strict();
 
+export const createInvitationBodySchema = z
+  .object({
+    name: z.string().trim().min(1).max(80),
+    email: z.string().trim().toLowerCase().email().max(254),
+    role: z.enum(familyMemberRoles),
+  })
+  .strict();
+
+export const acceptInvitationBodySchema = z
+  .object({
+    token: z.string().trim().min(1),
+  })
+  .strict();
+
 export type UpdateProfileInput = z.infer<typeof updateProfileBodySchema>;
+export type CreateInvitationInput = z.infer<typeof createInvitationBodySchema>;
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationBodySchema>;
