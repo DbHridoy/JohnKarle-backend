@@ -3,6 +3,7 @@ import mongoose, { Schema, Types, type HydratedDocument, type Model } from "mong
 import {
   familyMemberRoles,
   type FamilyMember,
+  type FamilyMemberRole,
   type UserPreferences,
   type UserProfilePicture,
   userRoles,
@@ -22,6 +23,11 @@ export type User = {
   familyMembers: FamilyMember[];
   preferences: UserPreferences;
   refreshTokenVersion: number;
+  invitedBy?: Types.ObjectId;
+  invitationRole?: FamilyMemberRole;
+  invitationTokenHash?: string;
+  invitationExpiresAt?: Date;
+  invitationAcceptedAt?: Date;
   passwordResetCodeHash?: string;
   passwordResetCodeExpiresAt?: Date;
   passwordResetTokenHash?: string;
@@ -183,6 +189,25 @@ const userSchema = new Schema<User, UserModel>(
         anonymousAnalytics: true,
       }),
       required: true,
+    },
+    invitedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    invitationRole: {
+      type: String,
+      enum: familyMemberRoles,
+    },
+    invitationTokenHash: {
+      type: String,
+      select: false,
+    },
+    invitationExpiresAt: {
+      type: Date,
+      select: false,
+    },
+    invitationAcceptedAt: {
+      type: Date,
     },
     refreshTokenVersion: {
       type: Number,
