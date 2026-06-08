@@ -6,6 +6,7 @@ import { authRouter } from "../modules/auth/auth.routes.js";
 // import { dashboardRouter } from "../modules/dashboard/dashboard.routes.js";
 // import { dailyStatRouter } from "../modules/daily-stats/daily-stat.routes.js";
 import { healthRouter } from "../modules/health/health.routes.js";
+import { memoryVaultRouter } from "../modules/memory-vault/memory-vault.routes.js";
 // import { notificationRouter } from "../modules/notifications/notification.routes.js";
 // import { userRouter } from "../modules/users/user.routes.js";
 
@@ -23,6 +24,7 @@ apiRouter.get("/", (_req, res) => {
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/auth", authRouter);
+apiRouter.use("/memory-vault", memoryVaultRouter);
 // apiRouter.use("/claims", claimRouter);
 // apiRouter.use("/contracts", contractRouter);
 // apiRouter.use("/dashboard", dashboardRouter);

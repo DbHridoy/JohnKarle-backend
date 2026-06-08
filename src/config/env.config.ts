@@ -25,6 +25,13 @@ export const env = cleanEnv(process.env, {
   OUTLOOK_PASSWORD: str({ default: "" }),
   PASSWORD_RESET_CODE_EXPIRES_MINUTES: num({ default: 10 }),
   PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: num({ default: 15 }),
+  AWS_REGION: str({ default: process.env.S3_REGION ?? "" }),
+  S3_BUCKET_NAME: str({
+    default:
+      process.env.AWS_S3_BUCKET_NAME ?? process.env.S3_BUCKET ?? process.env.BUCKET_NAME ?? "",
+  }),
+  AWS_ACCESS_KEY_ID: str({ default: "" }),
+  AWS_SECRET_ACCESS_KEY: str({ default: "" }),
 });
 
 if (env.NODE_ENV === "production" && env.JWT_SECRET === developmentJwtSecret) {

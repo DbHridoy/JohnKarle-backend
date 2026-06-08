@@ -65,7 +65,7 @@ export const createApp = (): express.Express => {
     });
   });
 
-  app.get("/api/v1", apiRouter);
+  app.use("/api/v1", apiRouter);
 
   app.use("/api/auth", authRouter);
 

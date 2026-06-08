@@ -1,6 +1,7 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
 // import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import mongoose from "mongoose";
+import multer from "multer";
 import { ZodError } from "zod";
 
 import { env } from "../config/env.config.js";
@@ -26,6 +27,10 @@ const normalizeError = (error: unknown): ApiError => {
 
   if (error instanceof mongoose.Error.ValidationError) {
     return new ApiError(400, "Database validation failed.", "DATABASE_VALIDATION_ERROR");
+  }
+
+  if (error instanceof multer.MulterError) {
+    return new ApiError(400, error.message, "FILE_UPLOAD_ERROR");
   }
 
   if (isDuplicateKeyError(error)) {
