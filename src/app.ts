@@ -8,6 +8,7 @@ import { env } from "./config/env.config.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { requestLogger } from "./middleware/request-logger.middleware.js";
+import { apiRouter } from "./router/index.js";
 
 const parseCorsOrigin = (value: string): CorsOptions["origin"] => {
   if (value === "*") {
@@ -53,6 +54,18 @@ export const createApp = (): express.Express => {
       },
     });
   });
+
+  app.get("/", (_req, res) => {
+    res.status(200).json({
+      success: true,
+      data: {
+        service: "john-karle-backend",
+        status: "ok",
+      },
+    });
+  });
+
+  app.get("/api/v1", apiRouter);
 
   app.use("/api/auth", authRouter);
 

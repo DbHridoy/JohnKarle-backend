@@ -10,6 +10,10 @@ export type User = {
   role: UserRole;
   isEmailVerified: boolean;
   refreshTokenVersion: number;
+  passwordResetCodeHash?: string;
+  passwordResetCodeExpiresAt?: Date;
+  passwordResetTokenHash?: string;
+  passwordResetTokenExpiresAt?: Date;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -57,6 +61,22 @@ const userSchema = new Schema<User, UserModel>(
       default: 0,
       required: true,
       min: 0,
+    },
+    passwordResetCodeHash: {
+      type: String,
+      select: false,
+    },
+    passwordResetCodeExpiresAt: {
+      type: Date,
+      select: false,
+    },
+    passwordResetTokenHash: {
+      type: String,
+      select: false,
+    },
+    passwordResetTokenExpiresAt: {
+      type: Date,
+      select: false,
     },
     lastLoginAt: {
       type: Date,

@@ -9,7 +9,7 @@ const startServer = async (): Promise<void> => {
   await ensureSuperAdmin();
 
   const server = app.listen(env.PORT, () => {
-    logger.info({ port: env.PORT }, "server listening");
+    logger.info(`Server listening on http://localhost:${env.PORT}`);
   });
 
   const shutdown = (signal: NodeJS.Signals): void => {
