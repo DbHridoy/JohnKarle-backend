@@ -49,4 +49,50 @@ describe("app routes", () => {
       },
     });
   });
+
+  it("validates forgot-password email payloads", async () => {
+    const response = await request(app).post("/api/auth/forgot-password").send({
+      email: "bad-email",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+      },
+    });
+  });
+
+  it("validates password reset code payloads", async () => {
+    const response = await request(app).post("/api/auth/forgot-password/verify-code").send({
+      email: "user@example.com",
+      code: "12345",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+      },
+    });
+  });
+
+  it("validates password reset confirmation payloads", async () => {
+    const response = await request(app).post("/api/auth/forgot-password/reset").send({
+      email: "user@example.com",
+      resetToken: "token",
+      password: "Password1",
+      confirmPassword: "Password2",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+      },
+    });
+  });
 });

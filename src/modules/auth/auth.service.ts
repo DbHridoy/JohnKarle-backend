@@ -1,4 +1,7 @@
 import bcrypt from "bcrypt";
+import crypto from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
+import nodemailer from "nodemailer";
 
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
@@ -6,13 +9,89 @@ import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { createAuthTokens, verifyToken } from "./auth.tokens.js";
 import type { AuthResponse } from "./auth.types.js";
-import type { LoginInput, RefreshInput, RegisterInput } from "./auth.validation.js";
+import type {
+  ForgotPasswordRequestInput,
+  LoginInput,
+  RefreshInput,
+  RegisterInput,
+  ResetPasswordInput,
+  VerifyPasswordResetCodeInput,
+} from "./auth.validation.js";
 
 const invalidCredentialsError = new ApiError(
   401,
   "Email or password is incorrect.",
   "INVALID_CREDENTIALS",
 );
+
+const passwordResetCodeError = new ApiError(
+  400,
+  "Password reset code is invalid or expired.",
+  "INVALID_PASSWORD_RESET_CODE",
+);
+
+const passwordResetTokenError = new ApiError(
+  400,
+  "Password reset session is invalid or expired.",
+  "INVALID_PASSWORD_RESET_TOKEN",
+);
+
+let transporter: nodemailer.Transporter | null = null;
+
+const getMailTransporter = (): nodemailer.Transporter => {
+  if (transporter) {
+    return transporter;
+  }
+
+  if (!env.OUTLOOK_EMAIL || !env.OUTLOOK_PASSWORD) {
+    throw new ApiError(
+      500,
+      "Outlook mail credentials are not configured.",
+      "MAIL_CONFIGURATION_ERROR",
+    );
+  }
+
+  transporter = nodemailer.createTransport({
+    service: "outlook",
+    secure: env.SMTP_SECURE,
+    auth: {
+      user: env.OUTLOOK_EMAIL,
+      pass: env.OUTLOOK_PASSWORD,
+    },
+  });
+
+  return transporter;
+};
+
+const hashSecret = (value: string): string =>
+  crypto.createHash("sha256").update(value).digest("hex");
+
+const buildFutureDate = (minutes: number): Date => new Date(Date.now() + minutes * 60 * 1000);
+
+const buildPasswordResetCodeEmail = (name: string, code: string): string =>
+  [
+    `Hello ${name},`,
+    "",
+    `Your password reset code is ${code}.`,
+    `This code will expire in ${env.PASSWORD_RESET_CODE_EXPIRES_MINUTES} minutes.`,
+    "",
+    "If you did not request a password reset, you can ignore this email.",
+  ].join("\n");
+
+const sendPasswordResetCodeEmail = async (
+  recipientEmail: string,
+  recipientName: string,
+  code: string,
+): Promise<void> => {
+  const mailTransporter = getMailTransporter();
+
+  await mailTransporter.sendMail({
+    from: env.OUTLOOK_EMAIL,
+    to: recipientEmail,
+    subject: "Password reset code",
+    text: buildPasswordResetCodeEmail(recipientName, code),
+  });
+};
 
 const buildAuthResponse = (user: UserDocument): AuthResponse => {
   const publicUser = toPublicUser(user);
@@ -76,6 +155,96 @@ export const refresh = async (input: RefreshInput): Promise<AuthResponse> => {
   }
 
   return buildAuthResponse(user);
+};
+
+export const requestPasswordResetCode = async (
+  input: ForgotPasswordRequestInput,
+): Promise<{ message: string }> => {
+  const email = input.email.trim().toLowerCase();
+  const user = await UserModel.findOne({ email }).exec();
+
+  if (!user) {
+    return {
+      message: "If an account exists for this email, a password reset code has been sent.",
+    };
+  }
+
+  const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
+
+  user.passwordResetCodeHash = hashSecret(code);
+  user.passwordResetCodeExpiresAt = buildFutureDate(env.PASSWORD_RESET_CODE_EXPIRES_MINUTES);
+  user.passwordResetTokenHash = undefined;
+  user.passwordResetTokenExpiresAt = undefined;
+
+  await user.save();
+  await sendPasswordResetCodeEmail(user.email, user.name, code);
+
+  return {
+    message: "If an account exists for this email, a password reset code has been sent.",
+  };
+};
+
+export const verifyPasswordResetCode = async (
+  input: VerifyPasswordResetCodeInput,
+): Promise<{ message: string; resetToken: string }> => {
+  const email = input.email.trim().toLowerCase();
+  const user = await UserModel.findOne({ email })
+    .select(
+      "+passwordResetCodeHash +passwordResetCodeExpiresAt +passwordResetTokenHash +passwordResetTokenExpiresAt",
+    )
+    .exec();
+
+  if (
+    !user ||
+    !user.passwordResetCodeHash ||
+    !user.passwordResetCodeExpiresAt ||
+    user.passwordResetCodeExpiresAt.getTime() < Date.now() ||
+    user.passwordResetCodeHash !== hashSecret(input.code)
+  ) {
+    throw passwordResetCodeError;
+  }
+
+  const resetToken = randomUUID();
+
+  user.passwordResetCodeHash = undefined;
+  user.passwordResetCodeExpiresAt = undefined;
+  user.passwordResetTokenHash = hashSecret(resetToken);
+  user.passwordResetTokenExpiresAt = buildFutureDate(env.PASSWORD_RESET_TOKEN_EXPIRES_MINUTES);
+
+  await user.save();
+
+  return {
+    message: "Password reset code verified successfully.",
+    resetToken,
+  };
+};
+
+export const resetPassword = async (input: ResetPasswordInput): Promise<{ message: string }> => {
+  const email = input.email.trim().toLowerCase();
+  const user = await UserModel.findOne({ email })
+    .select("+passwordHash +passwordResetTokenHash +passwordResetTokenExpiresAt")
+    .exec();
+
+  if (
+    !user ||
+    !user.passwordResetTokenHash ||
+    !user.passwordResetTokenExpiresAt ||
+    user.passwordResetTokenExpiresAt.getTime() < Date.now() ||
+    user.passwordResetTokenHash !== hashSecret(input.resetToken)
+  ) {
+    throw passwordResetTokenError;
+  }
+
+  user.passwordHash = await bcrypt.hash(input.password, env.BCRYPT_SALT_ROUNDS);
+  user.refreshTokenVersion += 1;
+  user.passwordResetTokenHash = undefined;
+  user.passwordResetTokenExpiresAt = undefined;
+
+  await user.save();
+
+  return {
+    message: "Password has been reset successfully.",
+  };
 };
 
 export const getProfile = async (userId: string) => {

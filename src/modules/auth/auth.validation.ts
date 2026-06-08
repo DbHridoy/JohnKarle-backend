@@ -31,6 +31,35 @@ export const refreshBodySchema = z
   })
   .strict();
 
+export const forgotPasswordRequestBodySchema = z
+  .object({
+    email: emailSchema,
+  })
+  .strict();
+
+export const verifyPasswordResetCodeBodySchema = z
+  .object({
+    email: emailSchema,
+    code: z.string().regex(/^\d{6}$/, "Code must be a 6-digit number."),
+  })
+  .strict();
+
+export const resetPasswordBodySchema = z
+  .object({
+    email: emailSchema,
+    resetToken: z.string().min(1),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1),
+  })
+  .strict()
+  .refine((value) => value.password === value.confirmPassword, {
+    message: "Confirm password must match password.",
+    path: ["confirmPassword"],
+  });
+
 export type RegisterInput = z.infer<typeof registerBodySchema>;
 export type LoginInput = z.infer<typeof loginBodySchema>;
 export type RefreshInput = z.infer<typeof refreshBodySchema>;
+export type ForgotPasswordRequestInput = z.infer<typeof forgotPasswordRequestBodySchema>;
+export type VerifyPasswordResetCodeInput = z.infer<typeof verifyPasswordResetCodeBodySchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordBodySchema>;
