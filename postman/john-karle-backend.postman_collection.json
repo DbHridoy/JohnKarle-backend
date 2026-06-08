@@ -510,7 +510,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
             }
           ]
         },
@@ -564,6 +564,187 @@
               "code": 204,
               "_postman_previewlanguage": "text",
               "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/users/profile",
+            "description": "Returns the authenticated user's profile."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/users/profile"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Demo User",
+                  "type": "text"
+                },
+                {
+                  "key": "phoneNumber",
+                  "value": "+8801712345678",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Main Street, Dhaka",
+                  "type": "text"
+                },
+                {
+                  "key": "familyMembers",
+                  "value": "[{\"name\":\"Jane Doe\",\"email\":\"jane@example.com\",\"role\":\"editor\"},{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"role\":\"viewer\"}]",
+                  "type": "text"
+                },
+                {
+                  "key": "notifications",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "aiInsight",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "darkMode",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "anonymousAnalytics",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePicture",
+                  "src": "{{profilePicturePath}}",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/users/profile",
+            "description": "Updates the authenticated user's profile. Send `familyMembers` as a JSON array string when using form-data."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Demo User",
+                      "type": "text"
+                    },
+                    {
+                      "key": "phoneNumber",
+                      "value": "+8801712345678",
+                      "type": "text"
+                    },
+                    {
+                      "key": "familyMembers",
+                      "value": "[{\"name\":\"Jane Doe\",\"email\":\"jane@example.com\",\"role\":\"editor\"}]",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": "{{apiV1BaseUrl}}/users/profile"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:15:00.000Z\"\n    }\n  }\n}"
             }
           ]
         }
@@ -1099,6 +1280,11 @@
     {
       "key": "memoryFilePathTwo",
       "value": "/absolute/path/to/file-two.jpg",
+      "type": "string"
+    },
+    {
+      "key": "profilePicturePath",
+      "value": "/absolute/path/to/profile-picture.jpg",
       "type": "string"
     }
   ]
