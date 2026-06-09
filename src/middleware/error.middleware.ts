@@ -1,5 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
-// import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import multer from "multer";
 import { ZodError } from "zod";
@@ -37,13 +37,13 @@ const normalizeError = (error: unknown): ApiError => {
     return new ApiError(409, "Resource already exists.", "DUPLICATE_RESOURCE", error.keyValue);
   }
 
-  // if (error instanceof TokenExpiredError) {
-  //   return new ApiError(401, "Token has expired.", "TOKEN_EXPIRED");
-  // }
+  if (error instanceof jwt.TokenExpiredError) {
+    return new ApiError(401, "Token has expired.", "TOKEN_EXPIRED");
+  }
 
-  // if (error instanceof JsonWebTokenError) {
-  //   return new ApiError(401, "Token is invalid.", "INVALID_TOKEN");
-  // }
+  if (error instanceof jwt.JsonWebTokenError) {
+    return new ApiError(401, "Token is invalid.", "INVALID_TOKEN");
+  }
 
   return new ApiError(500, "Internal server error.", "INTERNAL_SERVER_ERROR");
 };
