@@ -74,6 +74,31 @@
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
             }
           ]
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{serverUrl}}/docs",
+            "description": "Access the Swagger UI documentation page."
+          },
+          "response": []
+        },
+        {
+          "name": "Swagger Spec JSON",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{serverUrl}}/docs.json",
+            "description": "Get the raw OpenAPI specification JSON."
+          },
+          "response": []
         }
       ]
     },
