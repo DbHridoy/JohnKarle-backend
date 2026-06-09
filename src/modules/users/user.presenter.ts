@@ -12,6 +12,8 @@ export const toPublicUser = (user: UserDocument): PublicUser => ({
   ...(user.profilePicture ? { profilePicture: user.profilePicture } : {}),
   familyMembers: user.familyMembers,
   preferences: user.preferences,
+  legacyAccessEnabled: user.legacyAccessEnabled,
+  ...(user.lastActiveAt ? { lastActiveAt: user.lastActiveAt.toISOString() } : {}),
   ...(user.lastLoginAt ? { lastLoginAt: user.lastLoginAt.toISOString() } : {}),
   createdAt: user.createdAt.toISOString(),
   updatedAt: user.updatedAt.toISOString(),

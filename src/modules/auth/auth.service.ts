@@ -5,6 +5,7 @@ import { randomInt, randomUUID } from "node:crypto";
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { getMailTransporter } from "../../utils/mail.util.js";
+import { recordUserActivity } from "../legacy-access/legacy-access.activity.js";
 import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
 import { createAuthTokens, verifyToken } from "./auth.tokens.js";
@@ -124,7 +125,12 @@ export const login = async (input: LoginInput): Promise<AuthResponse> => {
   }
 
   user.lastLoginAt = new Date();
+  user.lastActiveAt = user.lastLoginAt;
   await user.save();
+  await recordUserActivity(user._id.toString(), {
+    actorType: user.role === "admin" || user.role === "super_admin" ? "admin" : "user",
+    forceCancelWaitingRequests: true,
+  });
 
   return buildAuthResponse(user);
 };

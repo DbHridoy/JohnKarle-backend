@@ -1,6 +1,7 @@
 import { Router, type Router as ExpressRouter } from "express";
 
 import { validateRequest } from "../../middleware/validate-request.middleware.js";
+import { trackAuthenticatedUserActivity } from "../legacy-access/legacy-access.activity.js";
 import * as authController from "./auth.controller.js";
 import { authenticate } from "./auth.middleware.js";
 import {
@@ -36,5 +37,5 @@ authRouter.post(
   validateRequest({ body: resetPasswordBodySchema }),
   authController.resetPassword,
 );
-authRouter.get("/me", authenticate, authController.me);
-authRouter.post("/logout", authenticate, authController.logout);
+authRouter.get("/me", authenticate, trackAuthenticatedUserActivity, authController.me);
+authRouter.post("/logout", authenticate, trackAuthenticatedUserActivity, authController.logout);

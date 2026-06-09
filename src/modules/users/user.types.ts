@@ -36,6 +36,8 @@ export type PublicUser = {
   profilePicture?: UserProfilePicture;
   familyMembers: FamilyMember[];
   preferences: UserPreferences;
+  legacyAccessEnabled: boolean;
+  lastActiveAt?: string;
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
