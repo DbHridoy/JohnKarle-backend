@@ -51,13 +51,13 @@ export const verifyToken = (token: string, expectedType: TokenType): JwtPayload 
       throw error;
     }
 
-    // if (error instanceof TokenExpiredError) {
-    //   throw new ApiError(401, "Token has expired.", "TOKEN_EXPIRED");
-    // }
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(401, "Token has expired.", "TOKEN_EXPIRED");
+    }
 
-    // if (error instanceof JsonWebTokenError) {
-    //   throw new ApiError(401, "Token is invalid.", "INVALID_TOKEN");
-    // }
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new ApiError(401, "Token is invalid.", "INVALID_TOKEN");
+    }
 
     throw error;
   }
