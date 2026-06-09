@@ -8,7 +8,7 @@ const startServer = async (): Promise<void> => {
   await connectDatabase();
   await ensureSuperAdmin();
 
-  const server = app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, "0.0.0.0", () => {
     logger.info(`Server listening on http://localhost:${env.PORT}`);
   });
 
