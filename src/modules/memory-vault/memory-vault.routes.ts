@@ -2,6 +2,7 @@ import { Router, type Router as ExpressRouter } from "express";
 
 import { validateRequest } from "../../middleware/validate-request.middleware.js";
 import { authenticate } from "../auth/auth.middleware.js";
+import { trackAuthenticatedUserActivity } from "../legacy-access/legacy-access.activity.js";
 import * as memoryVaultController from "./memory-vault.controller.js";
 import {
   createMemoryVaultBodySchema,
@@ -12,7 +13,7 @@ import { memoryVaultUpload, normalizeMemoryVaultPayload } from "./memory-vault.u
 
 export const memoryVaultRouter: ExpressRouter = Router();
 
-memoryVaultRouter.use(authenticate);
+memoryVaultRouter.use(authenticate, trackAuthenticatedUserActivity);
 
 memoryVaultRouter.get("/", memoryVaultController.listMemories);
 memoryVaultRouter.get("/timeline", memoryVaultController.getTimeline);

@@ -2,6 +2,7 @@ import { Router, type Router as ExpressRouter } from "express";
 
 import { validateRequest } from "../../middleware/validate-request.middleware.js";
 import { authenticate } from "../auth/auth.middleware.js";
+import { trackAuthenticatedUserActivity } from "../legacy-access/legacy-access.activity.js";
 import * as userController from "./user.controller.js";
 import { userProfileUpload } from "./user.upload.js";
 import {
@@ -18,7 +19,7 @@ userRouter.post(
   userController.acceptInvitation,
 );
 
-userRouter.use(authenticate);
+userRouter.use(authenticate, trackAuthenticatedUserActivity);
 
 userRouter.get("/profile", userController.getProfile);
 userRouter.post(
