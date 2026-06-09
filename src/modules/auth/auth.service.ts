@@ -4,7 +4,7 @@ import { randomInt, randomUUID } from "node:crypto";
 
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
-import { getMailTransporter } from "../../utils/mail.util.js";
+import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { recordUserActivity } from "../legacy-access/legacy-access.activity.js";
 import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
@@ -57,10 +57,7 @@ const sendPasswordResetCodeEmail = async (
   recipientName: string,
   code: string,
 ): Promise<void> => {
-  const mailTransporter = getMailTransporter();
-
-  await mailTransporter.sendMail({
-    from: env.OUTLOOK_EMAIL,
+  await sendTransactionalEmail({
     to: recipientEmail,
     subject: "Password reset code",
     text: buildPasswordResetCodeEmail(recipientName, code),
