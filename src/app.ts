@@ -3,8 +3,10 @@ import cors, { type CorsOptions } from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 
 import { env } from "./config/env.config.js";
+import { swaggerSpec } from "./config/swagger.config.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { requestLogger } from "./middleware/request-logger.middleware.js";
@@ -25,7 +27,14 @@ export const createApp = (): express.Express => {
   const app = express();
 
   app.disable("x-powered-by");
-  app.use(helmet());
+
+  // Configure Helmet. Disable CSP so that Swagger UI scripts and styles load successfully.
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
+
   app.use(
     cors({
       credentials: true,
@@ -44,6 +53,15 @@ export const createApp = (): express.Express => {
       windowMs: 15 * 60 * 1000,
     }),
   );
+
+  // Serve swagger JSON spec
+  app.get(["/docs.json", "/api-docs.json"], (_req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
+
+  // Serve Swagger UI
+  app.use(["/docs", "/api-docs"], swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   app.get("/health", (_req, res) => {
     res.status(200).json({
