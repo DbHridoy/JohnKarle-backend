@@ -1347,6 +1347,605 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Trusted Contacts",
+      "item": [
+        {
+          "name": "Add Trusted Contact",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('trusted contact created', function () { pm.response.to.have.status(201); });",
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.trustedContact) { pm.collectionVariables.set('trustedContactId', json.data.trustedContact.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Trusted Contact\",\n  \"email\": \"{{trustedContactEmail}}\",\n  \"phone\": \"+15551234567\",\n  \"inactivityDays\": 90,\n  \"accessScope\": {\n    \"profile\": true,\n    \"documents\": true,\n    \"notes\": true,\n    \"messages\": false,\n    \"paymentInfo\": false,\n    \"accountTransfer\": false\n  },\n  \"currentPassword\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/trusted-contacts",
+            "description": "Creates a pending trusted contact after password reauthentication."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{apiV1BaseUrl}}/trusted-contacts"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"trustedContact\": {\n      \"id\": \"trusted-contact-id\",\n      \"name\": \"Trusted Contact\",\n      \"email\": \"trusted.contact@example.com\",\n      \"status\": \"pending\",\n      \"inactivityDays\": 90,\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": true,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n    },\n    \"message\": \"Trusted contact added successfully.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Trusted Contacts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts",
+            "description": "Returns the authenticated user's trusted contacts without any token hashes."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"trustedContacts\": [\n      {\n        \"id\": \"trusted-contact-id\",\n        \"name\": \"Trusted Contact\",\n        \"email\": \"trusted.contact@example.com\",\n        \"status\": \"accepted\",\n        \"inactivityDays\": 90,\n        \"accessScope\": {\n          \"profile\": true,\n          \"documents\": false,\n          \"notes\": true,\n          \"messages\": false,\n          \"paymentInfo\": false,\n          \"accountTransfer\": false\n        },\n        \"acceptedAt\": \"2026-06-11T00:00:00.000Z\",\n        \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Trusted Contact",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inactivityDays\": 120,\n  \"accessScope\": {\n    \"profile\": true,\n    \"documents\": false,\n    \"notes\": true,\n    \"messages\": false,\n    \"paymentInfo\": false,\n    \"accountTransfer\": false\n  },\n  \"currentPassword\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/{{trustedContactId}}",
+            "description": "Updates trusted contact metadata and scope after password reauthentication."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/{{trustedContactId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"trustedContact\": {\n      \"id\": \"trusted-contact-id\",\n      \"name\": \"Trusted Contact\",\n      \"email\": \"trusted.contact@example.com\",\n      \"status\": \"accepted\",\n      \"inactivityDays\": 120,\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": false,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-12T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Trusted Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/{{trustedContactId}}",
+            "description": "Soft-removes a trusted contact and cancels active legacy requests for that contact."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/{{trustedContactId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Trusted contact removed successfully.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Invitation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}",
+            "description": "Validates the invitation token and returns safe invitation metadata."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitation\": {\n      \"trustedContact\": {\n        \"name\": \"Trusted Contact\",\n        \"email\": \"trusted.contact@example.com\"\n      },\n      \"owner\": {\n        \"name\": \"Demo User\"\n      },\n      \"status\": \"pending\",\n      \"inactivityDays\": 90,\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": true,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"expiresAt\": \"2026-06-13T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Accept Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}/accept",
+            "description": "Accepts the trusted contact invitation and invalidates the one-time token."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}/accept"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"trustedContact\": {\n      \"id\": \"trusted-contact-id\",\n      \"status\": \"accepted\"\n    },\n    \"message\": \"Trusted contact invitation accepted.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Decline Invitation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}/decline",
+            "description": "Declines the trusted contact invitation and invalidates the one-time token."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invite/{{trustedContactInviteToken}}/decline"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Trusted contact invitation declined.\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Legacy Access",
+      "item": [
+        {
+          "name": "Update Legacy Access Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"legacyAccessEnabled\": true,\n  \"currentPassword\": \"{{userPassword}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/legacy-access/settings",
+            "description": "Enables or disables legacy access after password reauthentication."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": "{{apiV1BaseUrl}}/legacy-access/settings"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"user-id\",\n      \"email\": \"demo.user@example.com\",\n      \"legacyAccessEnabled\": true\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Legacy Access Requests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.requests && json.data.requests[0]) { pm.collectionVariables.set('legacyAccessRequestId', json.data.requests[0].id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/legacy-access/requests",
+            "description": "Lists legacy access requests for the authenticated trusted-contact account."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/legacy-access/requests"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"requests\": [\n      {\n        \"id\": \"legacy-request-id\",\n        \"userId\": \"user-id\",\n        \"trustedContactId\": \"trusted-contact-id\",\n        \"trustedContact\": {\n          \"id\": \"trusted-contact-id\",\n          \"name\": \"Trusted Contact\",\n          \"email\": \"trusted.contact@example.com\",\n          \"status\": \"accepted\",\n          \"accessScope\": {\n            \"profile\": true,\n            \"documents\": false,\n            \"notes\": true,\n            \"messages\": false,\n            \"paymentInfo\": false,\n            \"accountTransfer\": false\n          }\n        },\n        \"status\": \"waiting_period\",\n        \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n        \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n        \"expiresAt\": \"2026-07-24T00:00:00.000Z\",\n        \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Claim Legacy Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/claim",
+            "description": "Claims a waiting-period request after unlockAt has passed."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/claim"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"request\": {\n      \"id\": \"legacy-request-id\",\n      \"status\": \"approved\",\n      \"approvedAt\": \"2026-06-24T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Legacy Access Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/data",
+            "description": "Returns only the data allowed by the trusted-contact access scope. Passwords, tokens, credentials, and payment secrets are never returned."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/data"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": {\n      \"request\": {\n        \"id\": \"legacy-request-id\",\n        \"status\": \"approved\",\n        \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n        \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n        \"approvedAt\": \"2026-06-24T12:00:00.000Z\"\n      },\n      \"owner\": {\n        \"id\": \"user-id\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo.user@example.com\"\n      },\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": false,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"profile\": {\n        \"id\": \"user-id\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo.user@example.com\",\n        \"role\": \"user\",\n        \"isEmailVerified\": true,\n        \"familyMembers\": [],\n        \"preferences\": {\n          \"notifications\": true,\n          \"aiInsight\": true,\n          \"darkMode\": false,\n          \"anonymousAnalytics\": true\n        },\n        \"legacyAccessEnabled\": true,\n        \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      },\n      \"notes\": [\n        {\n          \"id\": \"memory-id\",\n          \"type\": \"journal\",\n          \"title\": \"Legacy note\",\n          \"narrative\": \"Visible note\",\n          \"whoseMemoryIsThis\": \"Demo User\",\n          \"files\": [],\n          \"date\": \"2026-06-01T00:00:00.000Z\",\n          \"tags\": [],\n          \"createdAt\": \"2026-06-01T00:00:00.000Z\",\n          \"updatedAt\": \"2026-06-01T00:00:00.000Z\"\n        }\n      ]\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Legacy Access Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/cancel",
+            "description": "Cancels a waiting or approved legacy access request as the original user."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/cancel"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Legacy access request cancelled.\"\n  }\n}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -1443,6 +2042,31 @@
     {
       "key": "profilePicturePath",
       "value": "/absolute/path/to/profile-picture.jpg",
+      "type": "string"
+    },
+    {
+      "key": "trustedContactId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trustedContactInviteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "legacyAccessRequestId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trustedContactEmail",
+      "value": "trusted.contact@example.com",
+      "type": "string"
+    },
+    {
+      "key": "trustedContactPassword",
+      "value": "ChangeMe123!",
       "type": "string"
     }
   ]
