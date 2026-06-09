@@ -41,9 +41,12 @@ const familyMembersSchema = z.preprocess(
   z
     .array(
       z.object({
+        userId: z.string().trim().min(1).optional(),
         name: z.string().trim().min(1).max(80),
         email: z.string().trim().toLowerCase().email().max(254),
+        relation: z.string().trim().min(1).max(50),
         role: z.enum(familyMemberRoles),
+        status: z.enum(["pending", "accepted"]).default("accepted"),
       }),
     )
     .max(50),
@@ -66,6 +69,7 @@ export const createInvitationBodySchema = z
   .object({
     name: z.string().trim().min(1).max(80),
     email: z.string().trim().toLowerCase().email().max(254),
+    relation: z.string().trim().min(1).max(50),
     role: z.enum(familyMemberRoles),
   })
   .strict();
