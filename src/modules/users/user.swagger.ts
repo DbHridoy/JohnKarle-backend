@@ -68,7 +68,7 @@
  *                 example: "123 Main St, Springfield"
  *               familyMembers:
  *                 type: string
- *                 description: 'JSON array of family member objects, e.g. [{"name":"Jane","email":"jane@example.com","role":"viewer"}]'
+ *                 description: 'JSON array of family member objects, e.g. [{"name":"Jane","email":"jane@example.com","relation":"sister","role":"viewer","status":"accepted"}]'
  *               notifications:
  *                 type: boolean
  *                 description: Enable/disable notifications
@@ -121,7 +121,7 @@
  *   post:
  *     tags: [Users]
  *     summary: Create a family invitation
- *     description: Invites a new family member by email. Creates a user account with an invitation token and sends an email with a temporary password and invitation link.
+ *     description: Invites a family member by email. If the email belongs to an existing user, the family-member relationship remains pending until that user accepts. If the email does not belong to an existing user, a new user account is created with a temporary password and the relationship remains pending until acceptance.
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -142,6 +142,10 @@
  *                 format: email
  *                 maxLength: 254
  *                 example: jane@example.com
+ *               relation:
+ *                 type: string
+ *                 maxLength: 50
+ *                 example: brother
  *               role:
  *                 type: string
  *                 enum: [viewer, editor, owner]
@@ -172,6 +176,11 @@
  *                         role:
  *                           type: string
  *                           enum: [viewer, editor, owner]
+ *                         status:
+ *                           type: string
+ *                           enum: [pending]
+ *                         isExistingUser:
+ *                           type: boolean
  *                     message:
  *                       type: string
  *                       example: "Invitation sent successfully."
@@ -182,7 +191,7 @@
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
  *       409:
- *         description: Email already exists
+ *         description: Duplicate pending or accepted family invitation/member
  *         content:
  *           application/json:
  *             schema:

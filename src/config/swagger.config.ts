@@ -89,9 +89,12 @@ const options: swaggerJsdoc.Options = {
         FamilyMember: {
           type: "object",
           properties: {
+            userId: { type: "string" },
             name: { type: "string" },
             email: { type: "string", format: "email" },
+            relation: { type: "string", example: "brother" },
             role: { type: "string", enum: ["viewer", "editor", "owner"] },
+            status: { type: "string", enum: ["pending", "accepted"] },
           },
         },
         UserPreferences: {
