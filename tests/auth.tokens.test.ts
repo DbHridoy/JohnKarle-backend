@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import jwt from "jsonwebtoken";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = "test-secret-with-enough-length-for-auth-tests";
@@ -35,5 +36,32 @@ describe("auth tokens", () => {
     const tokens = createAuthTokens(subject);
 
     expect(() => verifyToken(tokens.accessToken, "refresh")).toThrow("Token is invalid.");
+  });
+
+  it("rejects expired access tokens with a token-expired error", () => {
+    const expiredToken = jwt.sign(
+      {
+        email: subject.email,
+        role: subject.role,
+        sub: subject.id,
+        tokenVersion: subject.tokenVersion,
+        type: "access",
+      },
+      process.env.JWT_SECRET!,
+      { expiresIn: -1 },
+    );
+
+    try {
+      verifyToken(expiredToken, "access");
+    } catch (error) {
+      expect(error).toMatchObject({
+        code: "TOKEN_EXPIRED",
+        message: "Token has expired.",
+        statusCode: 401,
+      });
+      return;
+    }
+
+    expect.unreachable("Expected verifyToken to throw for an expired access token.");
   });
 });
