@@ -33,6 +33,8 @@ export type User = {
   passwordResetTokenHash?: string;
   passwordResetTokenExpiresAt?: Date;
   lastLoginAt?: Date;
+  lastActiveAt?: Date;
+  legacyAccessEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -233,6 +235,16 @@ const userSchema = new Schema<User, UserModel>(
     },
     lastLoginAt: {
       type: Date,
+    },
+    lastActiveAt: {
+      type: Date,
+      index: true,
+    },
+    legacyAccessEnabled: {
+      type: Boolean,
+      required: true,
+      default: false,
+      index: true,
     },
   },
   {

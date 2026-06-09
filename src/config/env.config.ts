@@ -25,6 +25,12 @@ export const env = cleanEnv(process.env, {
   OUTLOOK_PASSWORD: str({ default: "" }),
   PASSWORD_RESET_CODE_EXPIRES_MINUTES: num({ default: 10 }),
   PASSWORD_RESET_TOKEN_EXPIRES_MINUTES: num({ default: 15 }),
+  LEGACY_ACCESS_INVITE_EXPIRES_HOURS: num({ default: 72 }),
+  LEGACY_ACCESS_WAITING_DAYS: num({ default: 14 }),
+  LEGACY_ACCESS_REQUEST_TTL_DAYS: num({ default: 44 }),
+  LEGACY_ACCESS_JOB_INTERVAL_HOURS: num({ default: 24 }),
+  LEGACY_ACCESS_ACTIVITY_TOUCH_INTERVAL_MINUTES: num({ default: 5 }),
+  LEGACY_ACCESS_JOB_ENABLED: bool({ default: true }),
   AWS_REGION: str({ default: process.env.S3_REGION ?? "" }),
   S3_BUCKET_NAME: str({
     default:

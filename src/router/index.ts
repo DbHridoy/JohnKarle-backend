@@ -6,8 +6,10 @@ import { authRouter } from "../modules/auth/auth.routes.js";
 // import { dashboardRouter } from "../modules/dashboard/dashboard.routes.js";
 // import { dailyStatRouter } from "../modules/daily-stats/daily-stat.routes.js";
 import { healthRouter } from "../modules/health/health.routes.js";
+import { legacyAccessRouter } from "../modules/legacy-access/legacy-access.routes.js";
 import { memoryVaultRouter } from "../modules/memory-vault/memory-vault.routes.js";
 // import { notificationRouter } from "../modules/notifications/notification.routes.js";
+import { trustedContactRouter } from "../modules/trusted-contacts/trusted-contact.routes.js";
 import { userRouter } from "../modules/users/user.routes.js";
 
 export const apiRouter: ExpressRouter = Router();
@@ -24,6 +26,8 @@ apiRouter.get("/", (_req, res) => {
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/auth", authRouter);
+apiRouter.use("/trusted-contacts", trustedContactRouter);
+apiRouter.use("/legacy-access", legacyAccessRouter);
 apiRouter.use("/memory-vault", memoryVaultRouter);
 apiRouter.use("/users", userRouter);
 // apiRouter.use("/claims", claimRouter);
