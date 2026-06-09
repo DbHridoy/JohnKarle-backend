@@ -1,6 +1,6 @@
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
-import { getMailTransporter } from "../../utils/mail.util.js";
+import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { requireRecentPasswordReauth } from "../auth/auth.reauth.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
@@ -30,10 +30,7 @@ const buildCancelLink = (requestId: string): string =>
   `${env.APP_BASE_URL.replace(/\/$/, "")}/legacy-access/requests/${encodeURIComponent(requestId)}/cancel`;
 
 const sendMail = async (to: string, subject: string, text: string): Promise<void> => {
-  const transporter = getMailTransporter();
-
-  await transporter.sendMail({
-    from: env.OUTLOOK_EMAIL,
+  await sendTransactionalEmail({
     to,
     subject,
     text,
