@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
-import { getMailTransporter } from "../../utils/mail.util.js";
+import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { toPublicUser } from "./user.presenter.js";
@@ -79,10 +79,7 @@ const sendInvitationEmail = async (
   invitationToken: string,
   generatedPassword?: string,
 ): Promise<void> => {
-  const mailTransporter = getMailTransporter();
-
-  await mailTransporter.sendMail({
-    from: env.OUTLOOK_EMAIL,
+  await sendTransactionalEmail({
     to: inviteeEmail,
     subject: "You have been invited",
     text: buildInvitationEmail(
