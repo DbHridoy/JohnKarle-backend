@@ -1,6 +1,6 @@
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
-import { getMailTransporter } from "../../utils/mail.util.js";
+import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
 import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { requireRecentPasswordReauth } from "../auth/auth.reauth.js";
@@ -42,10 +42,7 @@ const sendTrustedContactInvitationEmail = async (
   contactEmail: string,
   inviteToken: string,
 ): Promise<void> => {
-  const transporter = getMailTransporter();
-
-  await transporter.sendMail({
-    from: env.OUTLOOK_EMAIL,
+  await sendTransactionalEmail({
     to: contactEmail,
     subject: "Trusted contact invitation",
     text: buildInvitationEmail(ownerName, contactName, buildTrustedContactInviteLink(inviteToken)),
