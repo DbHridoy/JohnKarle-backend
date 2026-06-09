@@ -2,6 +2,7 @@ import mongoose, { Schema, Types, type HydratedDocument, type Model } from "mong
 
 import {
   familyMemberRoles,
+  familyMemberStatuses,
   type FamilyMember,
   type FamilyMemberRole,
   type UserPreferences,
@@ -78,6 +79,10 @@ const profilePictureSchema = new Schema<UserProfilePicture>(
 
 const familyMemberSchema = new Schema<FamilyMember>(
   {
+    userId: {
+      type: String,
+      trim: true,
+    },
     name: {
       type: String,
       required: true,
@@ -92,10 +97,23 @@ const familyMemberSchema = new Schema<FamilyMember>(
       trim: true,
       maxlength: 254,
     },
+    relation: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 50,
+    },
     role: {
       type: String,
       enum: familyMemberRoles,
       required: true,
+    },
+    status: {
+      type: String,
+      enum: familyMemberStatuses,
+      required: true,
+      default: "accepted",
     },
   },
   {
@@ -148,7 +166,6 @@ const userSchema = new Schema<User, UserModel>(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
       maxlength: 254,
