@@ -229,6 +229,7 @@ const options: swaggerJsdoc.Options = {
   },
   apis: [
     "./src/modules/auth/auth.swagger.ts",
+    "./src/modules/admin/admin.swagger.ts",
     "./src/modules/users/user.swagger.ts",
     "./src/modules/memory-vault/memory-vault.swagger.ts",
     "./src/modules/health/health.swagger.ts",

@@ -48,3 +48,7 @@ export const authorize =
 
     next();
   };
+
+export const authorizeAdmin: RequestHandler = authorize("admin", "super_admin");
+
+export const authorizeSuperAdmin: RequestHandler = authorize("super_admin");
