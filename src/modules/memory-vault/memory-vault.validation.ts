@@ -69,6 +69,17 @@ export const memoryVaultParamsSchema = z
   })
   .strict();
 
+export const memoryVaultQuerySchema = z
+  .object({
+    familyMemberUserId: z
+      .string()
+      .trim()
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid family member user id.")
+      .optional(),
+  })
+  .strict();
+
 export type CreateMemoryVaultInput = z.infer<typeof createMemoryVaultBodySchema>;
 export type UpdateMemoryVaultInput = z.infer<typeof updateMemoryVaultBodySchema>;
 export type MemoryVaultParams = z.infer<typeof memoryVaultParamsSchema>;
+export type MemoryVaultQuery = z.infer<typeof memoryVaultQuerySchema>;
