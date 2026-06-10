@@ -26,7 +26,7 @@ const options: swaggerJsdoc.Options = {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
-          description: "JWT access token obtained from /api/auth/login or /api/auth/register",
+          description: "JWT access token obtained from /api/v1/auth/login or /api/v1/auth/register",
         },
       },
       schemas: {

@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /api/auth/register:
+ * /api/v1/auth/register:
  *   post:
  *     tags: [Auth]
  *     summary: Register a new user account
@@ -65,7 +65,7 @@
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/v1/auth/login:
  *   post:
  *     tags: [Auth]
  *     summary: Log in with email and password
@@ -115,7 +115,7 @@
 
 /**
  * @swagger
- * /api/auth/refresh:
+ * /api/v1/auth/refresh:
  *   post:
  *     tags: [Auth]
  *     summary: Refresh authentication tokens
@@ -154,7 +154,7 @@
 
 /**
  * @swagger
- * /api/auth/forgot-password:
+ * /api/v1/auth/forgot-password:
  *   post:
  *     tags: [Auth]
  *     summary: Request a password reset code
@@ -192,7 +192,7 @@
 
 /**
  * @swagger
- * /api/auth/forgot-password/verify-code:
+ * /api/v1/auth/forgot-password/verify-code:
  *   post:
  *     tags: [Auth]
  *     summary: Verify the password reset code
@@ -243,7 +243,7 @@
 
 /**
  * @swagger
- * /api/auth/forgot-password/reset:
+ * /api/v1/auth/forgot-password/reset:
  *   post:
  *     tags: [Auth]
  *     summary: Reset password with reset token
@@ -299,7 +299,7 @@
 
 /**
  * @swagger
- * /api/auth/me:
+ * /api/v1/auth/me:
  *   get:
  *     tags: [Auth]
  *     summary: Get current user profile
@@ -332,7 +332,7 @@
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /api/v1/auth/logout:
  *   post:
  *     tags: [Auth]
  *     summary: Log out the current user

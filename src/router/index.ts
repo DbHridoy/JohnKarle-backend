@@ -17,7 +17,7 @@ export const apiRouter: ExpressRouter = Router();
 apiRouter.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
-    message: "Nicholas Cook9 API v1",
+    message: "John Karle API v1",
     data: {
       health: "/api/v1/health",
     },
