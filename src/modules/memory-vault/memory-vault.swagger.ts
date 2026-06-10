@@ -11,9 +11,17 @@
  *   get:
  *     tags: [Memory Vault]
  *     summary: List all memories
- *     description: Retrieves a list of all memories for the authenticated user, sorted by memory date and creation time descending.
+ *     description: Retrieves a list of memories for the authenticated user, or for an accepted family member when `familyMemberUserId` is provided, sorted by memory date and creation time descending.
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: familyMemberUserId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *         description: Accepted family member user id to filter memories by.
  *     responses:
  *       200:
  *         description: Memories list retrieved
@@ -46,9 +54,17 @@
  *   get:
  *     tags: [Memory Vault]
  *     summary: Get memories grouped by date
- *     description: Retrieves the timeline view, grouping memories by date (YYYY-MM-DD).
+ *     description: Retrieves the timeline view for the authenticated user, or for an accepted family member when `familyMemberUserId` is provided, grouping memories by date (YYYY-MM-DD).
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: familyMemberUserId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *         description: Accepted family member user id to filter the timeline by.
  *     responses:
  *       200:
  *         description: Timeline data retrieved

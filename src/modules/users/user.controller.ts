@@ -3,6 +3,7 @@ import type { RequestHandler } from "express";
 import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
 import * as userService from "./user.service.js";
+import type { FamilyInvitationParams } from "./user.validation.js";
 
 const requireAuthenticatedUser = (req: Express.Request) => {
   if (!req.user) {
@@ -40,6 +41,53 @@ export const acceptInvitation: RequestHandler = asyncHandler(async (req, res) =>
   res.status(200).json({
     success: true,
     data: result,
+  });
+});
+
+export const listInvitations: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const invitations = await userService.listInvitations(user);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      invitations,
+    },
+  });
+});
+
+export const acceptInvitationById: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const result = await userService.acceptInvitationById(user, req.params as FamilyInvitationParams);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+export const declineInvitationById: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const result = await userService.declineInvitationById(
+    user,
+    req.params as FamilyInvitationParams,
+  );
+
+  res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+export const listFamilyMembers: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const familyMembers = await userService.listFamilyMembers(user);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      familyMembers,
+    },
   });
 });
 

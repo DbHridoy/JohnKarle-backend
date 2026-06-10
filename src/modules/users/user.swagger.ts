@@ -117,6 +117,38 @@
 
 /**
  * @swagger
+ * /api/v1/users/family-members:
+ *   get:
+ *     tags: [Users]
+ *     summary: List accepted family members
+ *     description: Returns only accepted family members for the authenticated user.
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Accepted family members retrieved
+ *       401:
+ *         description: Authentication required
+ */
+
+/**
+ * @swagger
+ * /api/v1/users/invitations:
+ *   get:
+ *     tags: [Users]
+ *     summary: List pending invitations for the authenticated invitee
+ *     description: Returns pending family-member invitations addressed to the authenticated user by user id or email.
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Invitations retrieved
+ *       401:
+ *         description: Authentication required
+ */
+
+/**
+ * @swagger
  * /api/v1/users/invitations:
  *   post:
  *     tags: [Users]
@@ -196,6 +228,54 @@
  *           application/json:
  *             schema:
  *               $ref: "#/components/schemas/ErrorResponse"
+ */
+
+/**
+ * @swagger
+ * /api/v1/users/invitations/{invitationId}/accept:
+ *   post:
+ *     tags: [Users]
+ *     summary: Accept a pending family invitation as the authenticated invitee
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: invitationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *     responses:
+ *       200:
+ *         description: Invitation accepted
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Invitation not found
+ */
+
+/**
+ * @swagger
+ * /api/v1/users/invitations/{invitationId}/decline:
+ *   post:
+ *     tags: [Users]
+ *     summary: Decline a pending family invitation as the authenticated invitee
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: invitationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *     responses:
+ *       200:
+ *         description: Invitation declined
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Invitation not found
  */
 
 /**

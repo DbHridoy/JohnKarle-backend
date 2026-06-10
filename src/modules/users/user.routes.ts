@@ -8,6 +8,7 @@ import { userProfileUpload } from "./user.upload.js";
 import {
   acceptInvitationBodySchema,
   createInvitationBodySchema,
+  familyInvitationParamsSchema,
   updateProfileBodySchema,
 } from "./user.validation.js";
 
@@ -22,10 +23,22 @@ userRouter.post(
 userRouter.use(authenticate, trackAuthenticatedUserActivity);
 
 userRouter.get("/profile", userController.getProfile);
+userRouter.get("/family-members", userController.listFamilyMembers);
+userRouter.get("/invitations", userController.listInvitations);
 userRouter.post(
   "/invitations",
   validateRequest({ body: createInvitationBodySchema }),
   userController.createInvitation,
+);
+userRouter.post(
+  "/invitations/:invitationId/accept",
+  validateRequest({ params: familyInvitationParamsSchema }),
+  userController.acceptInvitationById,
+);
+userRouter.post(
+  "/invitations/:invitationId/decline",
+  validateRequest({ params: familyInvitationParamsSchema }),
+  userController.declineInvitationById,
 );
 userRouter.patch(
   "/profile",

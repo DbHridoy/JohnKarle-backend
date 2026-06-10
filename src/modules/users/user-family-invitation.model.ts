@@ -2,7 +2,13 @@ import mongoose, { Schema, Types, type HydratedDocument, type Model } from "mong
 
 import { familyMemberRoles, type FamilyMemberRole } from "./user.types.js";
 
-export const familyInvitationStatuses = ["pending", "accepted", "expired", "cancelled"] as const;
+export const familyInvitationStatuses = [
+  "pending",
+  "accepted",
+  "declined",
+  "expired",
+  "cancelled",
+] as const;
 
 export type FamilyInvitationStatus = (typeof familyInvitationStatuses)[number];
 
