@@ -4,8 +4,7 @@ import { randomUUID } from "node:crypto";
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
-import { UserModel } from "../users/user.model.js";
-import type { FamilyMember } from "../users/user.types.js";
+import { areAcceptedFamilyMembers } from "../users/user-family-membership.service.js";
 import { MemoryVaultModel, type MemoryVaultDocument } from "./memory-vault.model.js";
 import { toPublicMemoryVaultItem } from "./memory-vault.presenter.js";
 import type { MemoryTimelineGroup, MemoryVaultFile } from "./memory-vault.types.js";
@@ -113,6 +112,36 @@ const findOwnedMemoryOrThrow = async (
   return memory;
 };
 
+const findReadableMemoryOrThrow = async (
+  authenticatedUser: AuthenticatedUser,
+  memoryId: string,
+): Promise<MemoryVaultDocument> => {
+  const memory = await MemoryVaultModel.findById(memoryId).exec();
+
+  if (!memory) {
+    throw new ApiError(404, "Memory vault item not found.", "MEMORY_VAULT_NOT_FOUND");
+  }
+
+  if (memory.userId.toString() === authenticatedUser.id) {
+    return memory;
+  }
+
+  const isFamilyMember = await areAcceptedFamilyMembers(
+    authenticatedUser.id,
+    memory.userId.toString(),
+  );
+
+  if (!isFamilyMember) {
+    throw new ApiError(
+      403,
+      "You do not have permission to view this family member's memories.",
+      "FORBIDDEN",
+    );
+  }
+
+  return memory;
+};
+
 const ensureMemoryHasRequiredFiles = (type: string, fileCount: number): void => {
   if (type !== "journal" && fileCount === 0) {
     throw new ApiError(400, "At least one file is required for this memory type.", "FILE_REQUIRED");
@@ -129,18 +158,9 @@ const resolveReadableUserId = async (
     return authenticatedUser.id;
   }
 
-  const user = await UserModel.findById(authenticatedUser.id).exec();
+  const isFamilyMember = await areAcceptedFamilyMembers(authenticatedUser.id, familyMemberUserId);
 
-  if (!user) {
-    throw new ApiError(404, "User not found.", "USER_NOT_FOUND");
-  }
-
-  const matchingFamilyMember = user.familyMembers.find(
-    (familyMember: FamilyMember) =>
-      familyMember.userId === familyMemberUserId && familyMember.status === "accepted",
-  );
-
-  if (!matchingFamilyMember) {
+  if (!isFamilyMember) {
     throw new ApiError(
       403,
       "You do not have permission to view this family member's memories.",
@@ -215,7 +235,7 @@ export const getTimeline = async (
 };
 
 export const getMemory = async (user: AuthenticatedUser, params: MemoryVaultParams) => {
-  const memory = await findOwnedMemoryOrThrow(user.id, params.memoryId);
+  const memory = await findReadableMemoryOrThrow(user, params.memoryId);
 
   return toPublicMemoryVaultItem(memory);
 };

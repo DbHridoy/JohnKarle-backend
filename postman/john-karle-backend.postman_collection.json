@@ -2244,7 +2244,7 @@
     },
     {
       "key": "authBaseUrl",
-      "value": "{{serverUrl}}/api/auth",
+      "value": "{{apiV1BaseUrl}}/auth",
       "type": "string"
     },
     {

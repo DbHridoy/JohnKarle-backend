@@ -23,7 +23,7 @@ describe("app routes", () => {
   });
 
   it("validates register payloads before reaching persistence", async () => {
-    const response = await request(app).post("/api/auth/register").send({
+    const response = await request(app).post("/api/v1/auth/register").send({
       email: "not-an-email",
       name: "A",
       password: "short",
@@ -39,7 +39,7 @@ describe("app routes", () => {
   });
 
   it("requires an access token for the current-user route", async () => {
-    const response = await request(app).get("/api/auth/me");
+    const response = await request(app).get("/api/v1/auth/me");
 
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
@@ -51,7 +51,7 @@ describe("app routes", () => {
   });
 
   it("validates forgot-password email payloads", async () => {
-    const response = await request(app).post("/api/auth/forgot-password").send({
+    const response = await request(app).post("/api/v1/auth/forgot-password").send({
       email: "bad-email",
     });
 
@@ -65,7 +65,7 @@ describe("app routes", () => {
   });
 
   it("validates password reset code payloads", async () => {
-    const response = await request(app).post("/api/auth/forgot-password/verify-code").send({
+    const response = await request(app).post("/api/v1/auth/forgot-password/verify-code").send({
       email: "user@example.com",
       code: "12345",
     });
@@ -80,7 +80,7 @@ describe("app routes", () => {
   });
 
   it("validates password reset confirmation payloads", async () => {
-    const response = await request(app).post("/api/auth/forgot-password/reset").send({
+    const response = await request(app).post("/api/v1/auth/forgot-password/reset").send({
       email: "user@example.com",
       resetToken: "token",
       password: "Password1",

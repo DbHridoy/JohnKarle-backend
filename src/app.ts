@@ -8,7 +8,6 @@ import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env.config.js";
 import { swaggerSpec } from "./config/swagger.config.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
-import { authRouter } from "./modules/auth/auth.routes.js";
 import { requestLogger } from "./middleware/request-logger.middleware.js";
 import { apiRouter } from "./router/index.js";
 
@@ -84,9 +83,6 @@ export const createApp = (): express.Express => {
   });
 
   app.use("/api/v1", apiRouter);
-
-  app.use("/api/auth", authRouter);
-
   app.use(notFoundHandler);
   app.use(errorHandler);
 
