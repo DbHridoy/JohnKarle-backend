@@ -7,13 +7,17 @@ import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { toPublicUser } from "./user.presenter.js";
-import { UserFamilyInvitationModel } from "./user-family-invitation.model.js";
-import { UserModel } from "./user.model.js";
+import {
+  UserFamilyInvitationModel,
+  type UserFamilyInvitationDocument,
+} from "./user-family-invitation.model.js";
+import { UserModel, type UserDocument } from "./user.model.js";
 import type { FamilyMember } from "./user.types.js";
 import { deleteProfilePicture, uploadProfilePicture } from "./user.upload.js";
 import type {
   AcceptInvitationInput,
   CreateInvitationInput,
+  FamilyInvitationParams,
   UpdateProfileInput,
 } from "./user.validation.js";
 
@@ -89,6 +93,52 @@ const sendInvitationEmail = async (
       generatedPassword,
     ),
   });
+};
+
+const finalizeAcceptedInvitation = async (
+  invitation: UserFamilyInvitationDocument,
+  invitedUser: UserDocument,
+  inviter: UserDocument,
+): Promise<void> => {
+  invitation.status = "accepted";
+  invitation.acceptedAt = new Date();
+
+  const existingFamilyMemberIndex = inviter.familyMembers.findIndex(
+    (member: FamilyMember) => member.email === invitation.inviteeEmail,
+  );
+
+  if (existingFamilyMemberIndex >= 0) {
+    inviter.familyMembers[existingFamilyMemberIndex] = {
+      ...inviter.familyMembers[existingFamilyMemberIndex],
+      userId: invitedUser._id.toString(),
+      name: invitedUser.name,
+      relation: invitation.relation || inviter.familyMembers[existingFamilyMemberIndex]?.relation,
+      role: invitation.role,
+      status: "accepted",
+    };
+  } else {
+    inviter.familyMembers.push({
+      userId: invitedUser._id.toString(),
+      name: invitedUser.name,
+      email: invitedUser.email,
+      relation: invitation.relation,
+      role: invitation.role,
+      status: "accepted",
+    });
+  }
+
+  await inviter.save();
+  await invitedUser.save();
+  await invitation.save();
+};
+
+const removePendingFamilyMemberEntry = (
+  inviter: Awaited<ReturnType<typeof findUserOrThrow>>,
+  inviteeEmail: string,
+): void => {
+  inviter.familyMembers = inviter.familyMembers.filter(
+    (member: FamilyMember) => !(member.email === inviteeEmail && member.status === "pending"),
+  );
 };
 
 export const getProfile = async (authenticatedUser: AuthenticatedUser) => {
@@ -313,39 +363,111 @@ export const acceptInvitation = async (input: AcceptInvitationInput) => {
     invitedUser.isEmailVerified = true;
   }
 
-  invitation.status = "accepted";
-  invitation.acceptedAt = new Date();
-
-  const existingFamilyMemberIndex = inviter.familyMembers.findIndex(
-    (member: FamilyMember) => member.email === invitation.inviteeEmail,
-  );
-
-  if (existingFamilyMemberIndex >= 0) {
-    inviter.familyMembers[existingFamilyMemberIndex] = {
-      ...inviter.familyMembers[existingFamilyMemberIndex],
-      userId: invitedUser._id.toString(),
-      name: invitedUser.name,
-      relation: invitation.relation,
-      role: invitation.role,
-      status: "accepted",
-    };
-  } else {
-    inviter.familyMembers.push({
-      userId: invitedUser._id.toString(),
-      name: invitedUser.name,
-      email: invitedUser.email,
-      relation: invitation.relation,
-      role: invitation.role,
-      status: "accepted",
-    });
-  }
-
-  await inviter.save();
-  await invitedUser.save();
-  await invitation.save();
+  await finalizeAcceptedInvitation(invitation, invitedUser, inviter);
 
   return {
     email: invitedUser.email,
     message: "Invitation accepted successfully.",
   };
+};
+
+export const listInvitations = async (authenticatedUser: AuthenticatedUser) => {
+  const invitations = await UserFamilyInvitationModel.find({
+    $or: [{ inviteeUserId: authenticatedUser.id }, { inviteeEmail: authenticatedUser.email }],
+    status: "pending",
+  })
+    .sort({ createdAt: -1 })
+    .exec();
+
+  return invitations.map((invitation) => ({
+    id: invitation._id.toString(),
+    inviterId: invitation.inviterId.toString(),
+    ...(invitation.inviteeUserId ? { inviteeUserId: invitation.inviteeUserId.toString() } : {}),
+    inviteeEmail: invitation.inviteeEmail,
+    inviteeName: invitation.inviteeName,
+    relation: invitation.relation,
+    role: invitation.role,
+    status: invitation.status,
+    expiresAt: invitation.expiresAt.toISOString(),
+    createdAt: invitation.createdAt.toISOString(),
+    updatedAt: invitation.updatedAt.toISOString(),
+  }));
+};
+
+export const acceptInvitationById = async (
+  authenticatedUser: AuthenticatedUser,
+  params: FamilyInvitationParams,
+) => {
+  const invitation = await UserFamilyInvitationModel.findOne({
+    _id: params.invitationId,
+    $or: [{ inviteeUserId: authenticatedUser.id }, { inviteeEmail: authenticatedUser.email }],
+    status: "pending",
+  })
+    .select("+tokenHash +expiresAt")
+    .exec();
+
+  if (!invitation) {
+    throw new ApiError(404, "Invitation not found.", "INVITATION_NOT_FOUND");
+  }
+
+  if (invitation.expiresAt.getTime() < Date.now()) {
+    invitation.status = "expired";
+    await invitation.save();
+    throw new ApiError(400, "Invitation has expired.", "INVITATION_EXPIRED");
+  }
+
+  const invitedUser =
+    (invitation.inviteeUserId ? await UserModel.findById(invitation.inviteeUserId).exec() : null) ??
+    (await UserModel.findOne({ email: invitation.inviteeEmail })
+      .select("+invitationTokenHash +invitationExpiresAt")
+      .exec());
+  const inviter = await UserModel.findById(invitation.inviterId).exec();
+
+  if (!invitedUser || !inviter) {
+    throw new ApiError(404, "Invitation is no longer valid.", "INVALID_INVITATION");
+  }
+
+  await finalizeAcceptedInvitation(invitation, invitedUser, inviter);
+
+  return {
+    email: invitedUser.email,
+    message: "Invitation accepted successfully.",
+  };
+};
+
+export const declineInvitationById = async (
+  authenticatedUser: AuthenticatedUser,
+  params: FamilyInvitationParams,
+) => {
+  const invitation = await UserFamilyInvitationModel.findOne({
+    _id: params.invitationId,
+    $or: [{ inviteeUserId: authenticatedUser.id }, { inviteeEmail: authenticatedUser.email }],
+    status: "pending",
+  }).exec();
+
+  if (!invitation) {
+    throw new ApiError(404, "Invitation not found.", "INVITATION_NOT_FOUND");
+  }
+
+  invitation.status = "declined";
+  await invitation.save();
+
+  const inviter = await UserModel.findById(invitation.inviterId).exec();
+
+  if (inviter) {
+    removePendingFamilyMemberEntry(inviter, invitation.inviteeEmail);
+    await inviter.save();
+  }
+
+  return {
+    message: "Invitation declined successfully.",
+  };
+};
+
+export const listFamilyMembers = async (authenticatedUser: AuthenticatedUser) => {
+  const user = await findUserOrThrow(authenticatedUser.id);
+
+  return user.familyMembers.filter(
+    (familyMember: FamilyMember) => familyMember.status === "accepted",
+  );
 };

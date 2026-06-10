@@ -99,6 +99,97 @@
             "description": "Get the raw OpenAPI specification JSON."
           },
           "response": []
+        },
+        {
+          "name": "Root Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{serverUrl}}/",
+            "description": "Checks the root status route."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{serverUrl}}/"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "API v1 Root",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/",
+            "description": "Checks the versioned API root route."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Nicholas Cook9 API v1\",\n  \"data\": {\n    \"health\": \"/api/v1/health\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Swagger UI Alias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{serverUrl}}/api-docs",
+            "description": "Access the Swagger UI documentation alias."
+          },
+          "response": []
+        },
+        {
+          "name": "Swagger Spec JSON Alias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{serverUrl}}/api-docs.json",
+            "description": "Get the raw OpenAPI specification JSON alias."
+          },
+          "response": []
         }
       ]
     },
@@ -774,7 +865,7 @@
           ]
         },
         {
-          "name": "Create Invitation",
+          "name": "Create Family Member Invitation",
           "request": {
             "auth": {
               "type": "bearer",
@@ -802,7 +893,7 @@
               "raw": "{\n  \"name\": \"{{invitedUserName}}\",\n  \"email\": \"{{invitedUserEmail}}\",\n  \"role\": \"editor\"\n}"
             },
             "url": "{{apiV1BaseUrl}}/users/invitations",
-            "description": "Creates an invitation, emails the app link and generated password, and expires after 24 hours."
+            "description": "Creates a family-member invitation. If the email belongs to an existing user, the relationship remains pending until acceptance."
           },
           "response": [
             {
@@ -838,12 +929,12 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitation\": {\n      \"email\": \"jane@example.com\",\n      \"expiresAt\": \"2026-06-10T00:00:00.000Z\",\n      \"role\": \"editor\"\n    },\n    \"message\": \"Invitation sent successfully.\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitation\": {\n      \"email\": \"jane@example.com\",\n      \"expiresAt\": \"2026-06-11T00:00:00.000Z\",\n      \"relation\": \"brother\",\n      \"role\": \"editor\",\n      \"status\": \"pending\",\n      \"isExistingUser\": true\n    },\n    \"message\": \"Invitation sent successfully.\"\n  }\n}"
             }
           ]
         },
         {
-          "name": "Accept Invitation",
+          "name": "Accept Family Member Invitation",
           "request": {
             "method": "POST",
             "header": [
@@ -861,7 +952,7 @@
               "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
             },
             "url": "{{apiV1BaseUrl}}/users/invitations/accept",
-            "description": "Accepts an invitation token before the invited user logs in with the emailed password."
+            "description": "Accepts a pending family-member invitation using the invitation token from email."
           },
           "response": [
             {
@@ -890,6 +981,198 @@
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"email\": \"jane@example.com\",\n    \"message\": \"Invitation accepted successfully.\"\n  }\n}"
             }
           ]
+        },
+        {
+          "name": "List Family Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/users/family-members",
+            "description": "Lists only accepted family members for the authenticated user."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/users/family-members"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"familyMembers\": [\n      {\n        \"userId\": \"507f1f77bcf86cd799439099\",\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"relation\": \"sister\",\n        \"role\": \"viewer\",\n        \"status\": \"accepted\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Family Member Invitations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data && json.data.invitations && json.data.invitations[0]) { pm.collectionVariables.set('familyInvitationId', json.data.invitations[0].id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/users/invitations",
+            "description": "Lists pending family-member invitations for the authenticated invitee."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/users/invitations"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitations\": [\n      {\n        \"id\": \"family-invitation-id\",\n        \"inviterId\": \"507f1f77bcf86cd799439011\",\n        \"inviteeUserId\": \"507f1f77bcf86cd799439099\",\n        \"inviteeEmail\": \"jane@example.com\",\n        \"inviteeName\": \"Jane Doe\",\n        \"relation\": \"sister\",\n        \"role\": \"viewer\",\n        \"status\": \"pending\",\n        \"expiresAt\": \"2026-06-11T00:00:00.000Z\",\n        \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Accept Family Member Invitation In App",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/users/invitations/{{familyInvitationId}}/accept",
+            "description": "Accepts a pending family-member invitation as the authenticated invitee."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/users/invitations/{{familyInvitationId}}/accept"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"email\": \"jane@example.com\",\n    \"message\": \"Invitation accepted successfully.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Decline Family Member Invitation In App",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/users/invitations/{{familyInvitationId}}/decline",
+            "description": "Declines a pending family-member invitation as the authenticated invitee."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/users/invitations/{{familyInvitationId}}/decline"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Invitation declined successfully.\"\n  }\n}"
+            }
+          ]
         }
       ]
     },
@@ -916,8 +1199,8 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{apiV1BaseUrl}}/memory-vault",
-            "description": "Lists memory vault items for the current user."
+            "url": "{{apiV1BaseUrl}}/memory-vault?familyMemberUserId={{familyMemberUserId}}",
+            "description": "Lists the authenticated user's memories. Optionally pass familyMemberUserId to read an accepted family member's memories."
           },
           "response": [
             {
@@ -945,7 +1228,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memories\": [\n      {\n        \"id\": \"507f1f77bcf86cd799439012\",\n        \"type\": \"photo\",\n        \"whoseMemoryIsThis\": \"John\",\n        \"files\": [\n          {\n            \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"originalName\": \"photo.jpg\",\n            \"mimeType\": \"image/jpeg\",\n            \"size\": 245120\n          }\n        ],\n        \"title\": \"Beach Day\",\n        \"narrative\": \"A summer memory.\",\n        \"date\": \"2026-06-09T00:00:00.000Z\",\n        \"tags\": [\"family\", \"summer\"],\n        \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"memories\": [\n      {\n        \"id\": \"507f1f77bcf86cd799439012\",\n        \"type\": \"photo\",\n        \"whoseMemoryIsThis\": \"Brother A\",\n        \"files\": [\n          {\n            \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n            \"originalName\": \"photo.jpg\",\n            \"mimeType\": \"image/jpeg\",\n            \"size\": 245120\n          }\n        ],\n        \"title\": \"Beach Day\",\n        \"narrative\": \"A summer memory.\",\n        \"date\": \"2026-06-09T00:00:00.000Z\",\n        \"tags\": [\n          \"family\",\n          \"summer\"\n        ],\n        \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
             }
           ]
         },
@@ -969,8 +1252,8 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{apiV1BaseUrl}}/memory-vault/timeline",
-            "description": "Returns memories grouped by date for timeline rendering."
+            "url": "{{apiV1BaseUrl}}/memory-vault/timeline?familyMemberUserId={{familyMemberUserId}}",
+            "description": "Gets the authenticated user's timeline. Optionally pass familyMemberUserId to read an accepted family member's timeline."
           },
           "response": [
             {
@@ -998,7 +1281,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"timeline\": [\n      {\n        \"date\": \"2026-06-09\",\n        \"memories\": [\n          {\n            \"id\": \"507f1f77bcf86cd799439012\",\n            \"type\": \"photo\",\n            \"whoseMemoryIsThis\": \"John\",\n            \"files\": [\n              {\n                \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"originalName\": \"photo.jpg\",\n                \"mimeType\": \"image/jpeg\",\n                \"size\": 245120\n              }\n            ],\n            \"title\": \"Beach Day\",\n            \"narrative\": \"A summer memory.\",\n            \"date\": \"2026-06-09T00:00:00.000Z\",\n            \"tags\": [\"family\", \"summer\"],\n            \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n            \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n          }\n        ]\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"timeline\": [\n      {\n        \"date\": \"2026-06-09\",\n        \"memories\": [\n          {\n            \"id\": \"507f1f77bcf86cd799439012\",\n            \"type\": \"photo\",\n            \"whoseMemoryIsThis\": \"Brother A\",\n            \"files\": [\n              {\n                \"key\": \"memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/memory-vault/507f1f77bcf86cd799439011/1717891200000-photo.jpg\",\n                \"originalName\": \"photo.jpg\",\n                \"mimeType\": \"image/jpeg\",\n                \"size\": 245120\n              }\n            ],\n            \"title\": \"Beach Day\",\n            \"narrative\": \"A summer memory.\",\n            \"date\": \"2026-06-09T00:00:00.000Z\",\n            \"tags\": [\n              \"family\",\n              \"summer\"\n            ],\n            \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n            \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n          }\n        ]\n      }\n    ]\n  }\n}"
             }
           ]
         },
@@ -2067,6 +2350,16 @@
     {
       "key": "trustedContactPassword",
       "value": "ChangeMe123!",
+      "type": "string"
+    },
+    {
+      "key": "familyMemberUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "familyInvitationId",
+      "value": "",
       "type": "string"
     }
   ]

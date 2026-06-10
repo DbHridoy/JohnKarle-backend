@@ -80,6 +80,16 @@ export const acceptInvitationBodySchema = z
   })
   .strict();
 
+export const familyInvitationParamsSchema = z
+  .object({
+    invitationId: z
+      .string()
+      .trim()
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid invitation id."),
+  })
+  .strict();
+
 export type UpdateProfileInput = z.infer<typeof updateProfileBodySchema>;
 export type CreateInvitationInput = z.infer<typeof createInvitationBodySchema>;
 export type AcceptInvitationInput = z.infer<typeof acceptInvitationBodySchema>;
+export type FamilyInvitationParams = z.infer<typeof familyInvitationParamsSchema>;

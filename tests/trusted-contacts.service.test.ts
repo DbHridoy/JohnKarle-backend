@@ -5,14 +5,12 @@ process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = "test-secret-with-enough-length-for-auth-tests";
 process.env.LOG_LEVEL = "silent";
 
-const sendMailMock = vi.fn().mockResolvedValue(undefined);
+const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
 const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 const reauthMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../src/utils/mail.util.js", () => ({
-  getMailTransporter: () => ({
-    sendMail: sendMailMock,
-  }),
+  sendTransactionalEmail: sendTransactionalEmailMock,
 }));
 
 vi.mock("../src/modules/audit-logs/audit-log.service.js", () => ({
@@ -37,7 +35,7 @@ const mockExecResolved = <T>(value: T) => ({
 describe("trusted contact service", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    sendMailMock.mockClear();
+    sendTransactionalEmailMock.mockClear();
     createAuditLogMock.mockClear();
     reauthMock.mockClear();
   });
@@ -90,7 +88,7 @@ describe("trusted contact service", () => {
     );
 
     expect(result.trustedContact.email).toBe("trusted@example.com");
-    expect(sendMailMock).toHaveBeenCalledTimes(1);
+    expect(sendTransactionalEmailMock).toHaveBeenCalledTimes(1);
     expect(createAuditLogMock).toHaveBeenCalledWith(
       expect.objectContaining({ action: "trusted_contact_added" }),
     );
