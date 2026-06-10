@@ -8,6 +8,11 @@ import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/tok
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { toPublicUser } from "./user.presenter.js";
 import {
+  createAcceptedFamilyMembership,
+  listFamilyMembersForUser,
+  areAcceptedFamilyMembers,
+} from "./user-family-membership.service.js";
+import {
   UserFamilyInvitationModel,
   type UserFamilyInvitationDocument,
 } from "./user-family-invitation.model.js";
@@ -30,19 +35,21 @@ const generateInvitationPassword = (): string => {
 };
 
 const setFamilyMemberEntry = (
-  inviter: Awaited<ReturnType<typeof findUserOrThrow>>,
+  user: Awaited<ReturnType<typeof findUserOrThrow>>,
   entry: FamilyMember,
 ): FamilyMember | undefined => {
-  const existingFamilyMemberIndex = inviter.familyMembers.findIndex(
-    (member: FamilyMember) => member.email === entry.email,
+  const existingFamilyMemberIndex = user.familyMembers.findIndex(
+    (member: FamilyMember) =>
+      (entry.userId !== undefined && member.userId === entry.userId) ||
+      member.email === entry.email,
   );
   const previousFamilyMember =
-    existingFamilyMemberIndex >= 0 ? inviter.familyMembers[existingFamilyMemberIndex] : undefined;
+    existingFamilyMemberIndex >= 0 ? user.familyMembers[existingFamilyMemberIndex] : undefined;
 
   if (existingFamilyMemberIndex >= 0) {
-    inviter.familyMembers[existingFamilyMemberIndex] = entry;
+    user.familyMembers[existingFamilyMemberIndex] = entry;
   } else {
-    inviter.familyMembers.push(entry);
+    user.familyMembers.push(entry);
   }
 
   return previousFamilyMember;
@@ -95,37 +102,52 @@ const sendInvitationEmail = async (
   });
 };
 
+const syncAcceptedLegacyFamilyMembers = (
+  inviter: UserDocument,
+  invitedUser: UserDocument,
+  invitation: UserFamilyInvitationDocument,
+): void => {
+  setFamilyMemberEntry(inviter, {
+    userId: invitedUser._id.toString(),
+    name: invitedUser.name,
+    email: invitedUser.email,
+    relation: invitation.relation,
+    role: invitation.role,
+    status: "accepted",
+  });
+
+  setFamilyMemberEntry(invitedUser, {
+    userId: inviter._id.toString(),
+    name: inviter.name,
+    email: inviter.email,
+    relation: invitation.relation,
+    role: invitation.role,
+    status: "accepted",
+  });
+};
+
 const finalizeAcceptedInvitation = async (
   invitation: UserFamilyInvitationDocument,
   invitedUser: UserDocument,
   inviter: UserDocument,
 ): Promise<void> => {
+  const acceptedAt = new Date();
+
   invitation.status = "accepted";
-  invitation.acceptedAt = new Date();
+  invitation.acceptedAt = acceptedAt;
 
-  const existingFamilyMemberIndex = inviter.familyMembers.findIndex(
-    (member: FamilyMember) => member.email === invitation.inviteeEmail,
-  );
+  await createAcceptedFamilyMembership({
+    requesterId: inviter._id,
+    recipientId: invitedUser._id,
+    requesterRelationship: invitation.relation,
+    recipientRelationship: invitation.relation,
+    requesterRole: invitation.role,
+    recipientRole: invitation.role,
+    sourceInvitationId: invitation._id,
+    acceptedAt,
+  });
 
-  if (existingFamilyMemberIndex >= 0) {
-    inviter.familyMembers[existingFamilyMemberIndex] = {
-      ...inviter.familyMembers[existingFamilyMemberIndex],
-      userId: invitedUser._id.toString(),
-      name: invitedUser.name,
-      relation: invitation.relation || inviter.familyMembers[existingFamilyMemberIndex]?.relation,
-      role: invitation.role,
-      status: "accepted",
-    };
-  } else {
-    inviter.familyMembers.push({
-      userId: invitedUser._id.toString(),
-      name: invitedUser.name,
-      email: invitedUser.email,
-      relation: invitation.relation,
-      role: invitation.role,
-      status: "accepted",
-    });
-  }
+  syncAcceptedLegacyFamilyMembers(inviter, invitedUser, invitation);
 
   await inviter.save();
   await invitedUser.save();
@@ -212,6 +234,17 @@ export const createInvitation = async (
     throw new ApiError(400, "You cannot add yourself as a family member.", "SELF_FAMILY_INVITE");
   }
 
+  if (
+    existingUser &&
+    (await areAcceptedFamilyMembers(inviter._id.toString(), existingUser._id.toString()))
+  ) {
+    throw new ApiError(
+      409,
+      "This family member has already accepted the invitation.",
+      "FAMILY_MEMBER_ALREADY_EXISTS",
+    );
+  }
+
   const existingPendingInvitation = await UserFamilyInvitationModel.exists({
     inviterId: inviter._id,
     inviteeEmail: input.email,
@@ -223,18 +256,6 @@ export const createInvitation = async (
       409,
       "A pending invitation already exists for this family member.",
       "INVITATION_ALREADY_EXISTS",
-    );
-  }
-
-  const existingFamilyMember = inviter.familyMembers.find(
-    (member: FamilyMember) => member.email === input.email,
-  );
-
-  if (existingFamilyMember?.status === "accepted") {
-    throw new ApiError(
-      409,
-      "This family member has already accepted the invitation.",
-      "FAMILY_MEMBER_ALREADY_EXISTS",
     );
   }
 
@@ -464,10 +485,5 @@ export const declineInvitationById = async (
   };
 };
 
-export const listFamilyMembers = async (authenticatedUser: AuthenticatedUser) => {
-  const user = await findUserOrThrow(authenticatedUser.id);
-
-  return user.familyMembers.filter(
-    (familyMember: FamilyMember) => familyMember.status === "accepted",
-  );
-};
+export const listFamilyMembers = async (authenticatedUser: AuthenticatedUser) =>
+  listFamilyMembersForUser(authenticatedUser.id);
