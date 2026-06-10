@@ -5,10 +5,10 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/server.ts",
+    "dev": "node init && tsx src/server.ts",
     "dev:watch": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc",
+    "start": "node init && node dist/server.js",
+    "build": "node init && tsc",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
