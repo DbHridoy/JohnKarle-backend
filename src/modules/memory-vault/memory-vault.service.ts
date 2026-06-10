@@ -4,12 +4,15 @@ import { randomUUID } from "node:crypto";
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
+import { UserModel } from "../users/user.model.js";
+import type { FamilyMember } from "../users/user.types.js";
 import { MemoryVaultModel, type MemoryVaultDocument } from "./memory-vault.model.js";
 import { toPublicMemoryVaultItem } from "./memory-vault.presenter.js";
 import type { MemoryTimelineGroup, MemoryVaultFile } from "./memory-vault.types.js";
 import type {
   CreateMemoryVaultInput,
   MemoryVaultParams,
+  MemoryVaultQuery,
   UpdateMemoryVaultInput,
 } from "./memory-vault.validation.js";
 
@@ -116,6 +119,38 @@ const ensureMemoryHasRequiredFiles = (type: string, fileCount: number): void => 
   }
 };
 
+const resolveReadableUserId = async (
+  authenticatedUser: AuthenticatedUser,
+  query?: MemoryVaultQuery,
+): Promise<string> => {
+  const familyMemberUserId = query?.familyMemberUserId;
+
+  if (!familyMemberUserId || familyMemberUserId === authenticatedUser.id) {
+    return authenticatedUser.id;
+  }
+
+  const user = await UserModel.findById(authenticatedUser.id).exec();
+
+  if (!user) {
+    throw new ApiError(404, "User not found.", "USER_NOT_FOUND");
+  }
+
+  const matchingFamilyMember = user.familyMembers.find(
+    (familyMember: FamilyMember) =>
+      familyMember.userId === familyMemberUserId && familyMember.status === "accepted",
+  );
+
+  if (!matchingFamilyMember) {
+    throw new ApiError(
+      403,
+      "You do not have permission to view this family member's memories.",
+      "FORBIDDEN",
+    );
+  }
+
+  return familyMemberUserId;
+};
+
 export const createMemory = async (
   user: AuthenticatedUser,
   input: CreateMemoryVaultInput,
@@ -145,16 +180,20 @@ export const createMemory = async (
   }
 };
 
-export const listMemories = async (user: AuthenticatedUser) => {
-  const memories = await MemoryVaultModel.find({ userId: user.id })
+export const listMemories = async (user: AuthenticatedUser, query?: MemoryVaultQuery) => {
+  const readableUserId = await resolveReadableUserId(user, query);
+  const memories = await MemoryVaultModel.find({ userId: readableUserId })
     .sort({ date: -1, createdAt: -1 })
     .exec();
 
   return memories.map(toPublicMemoryVaultItem);
 };
 
-export const getTimeline = async (user: AuthenticatedUser): Promise<MemoryTimelineGroup[]> => {
-  const memories = await listMemories(user);
+export const getTimeline = async (
+  user: AuthenticatedUser,
+  query?: MemoryVaultQuery,
+): Promise<MemoryTimelineGroup[]> => {
+  const memories = await listMemories(user, query);
   const timeline = new Map<string, MemoryTimelineGroup>();
 
   for (const memory of memories) {

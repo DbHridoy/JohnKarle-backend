@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 
 import { env } from "../../config/env.config.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
+import { logger } from "../../utils/logger.util.js";
 import { UserModel } from "../users/user.model.js";
 import * as legacyAccessService from "./legacy-access.service.js";
 
@@ -38,16 +39,26 @@ export const recordUserActivity = async (
     return;
   }
 
-  await legacyAccessService.cancelWaitingRequestsDueToUserActivity(
-    (updatedUser?._id ?? userId).toString(),
-    {
-      action: options?.action ?? "legacy_access_cancelled_due_to_user_activity",
-      actorId: (updatedUser?._id ?? userId).toString(),
-      actorType: options?.actorType ?? "user",
-      ipAddress: options?.ipAddress,
-      userAgent: options?.userAgent,
-    },
-  );
+  try {
+    await legacyAccessService.cancelWaitingRequestsDueToUserActivity(
+      (updatedUser?._id ?? userId).toString(),
+      {
+        action: options?.action ?? "legacy_access_cancelled_due_to_user_activity",
+        actorId: (updatedUser?._id ?? userId).toString(),
+        actorType: options?.actorType ?? "user",
+        ipAddress: options?.ipAddress,
+        userAgent: options?.userAgent,
+      },
+    );
+  } catch (error) {
+    logger.warn(
+      {
+        err: error,
+        userId: (updatedUser?._id ?? userId).toString(),
+      },
+      "user activity side effects failed",
+    );
+  }
 };
 
 export const trackAuthenticatedUserActivity: RequestHandler = asyncHandler(

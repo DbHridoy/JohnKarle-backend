@@ -52,4 +52,18 @@ describe("memory vault routes", () => {
       },
     });
   });
+
+  it("validates family member user id filters", async () => {
+    const response = await request(app).get(
+      "/api/v1/memory-vault/timeline?familyMemberUserId=bad-id",
+    );
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "AUTH_REQUIRED",
+      },
+    });
+  });
 });
