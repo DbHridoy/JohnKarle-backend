@@ -2229,6 +2229,376 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/dashboard/metrics",
+            "description": "Returns admin dashboard metrics. totalActiveProfiles is currently based on users with a recorded lastActiveAt timestamp."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/dashboard/metrics"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalUsers\": 42,\n    \"totalActiveProfiles\": 18\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}",
+            "description": "Lists users for admin management with pagination and optional search by name, email, or phone."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"users\": [],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 20,\n      \"total\": 0,\n      \"totalPages\": 1\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/users/{{adminManagedUserId}}",
+            "description": "Returns a sanitized single-user record for admin management."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/users/{{adminManagedUserId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"{{adminManagedUserId}}\",\n      \"name\": \"Managed User\",\n      \"email\": \"managed.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": true,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin.user@example.com\",\n  \"password\": \"Password1\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Admin Street\",\n  \"profileImage\": \"{{adminProfileImageUrl}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/admins",
+            "description": "Creates a new admin user. Super-admin access required."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/admins"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439015\",\n      \"name\": \"Admin User\",\n      \"email\": \"admin.user@example.com\",\n      \"role\": \"admin\",\n      \"isEmailVerified\": false,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bulk Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userIds\": [\"{{adminManagedUserId}}\"],\n  \"subject\": \"Important update\",\n  \"message\": \"Hello, this is an important update.\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/bulk-email",
+            "description": "Sends a private transactional email to each selected user individually."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/bulk-email"
+              },
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"requestedCount\": 1,\n    \"sentCount\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Admin Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/profile",
+            "description": "Returns the authenticated admin or super-admin profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admin Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Admin Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "+1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "Updated Admin Address",
+                  "type": "text"
+                },
+                {
+                  "key": "profileImage",
+                  "value": "{{adminProfileImageUrl}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/admin/profile",
+            "description": "Updates the authenticated admin profile. Email is read-only. You may also upload a profilePicture file instead of using profileImage."
+          },
+          "response": []
+        },
+        {
+          "name": "Change Admin Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{userPassword}}\",\n  \"newPassword\": \"{{newUserPassword}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/profile/password",
+            "description": "Changes the authenticated admin or super-admin password."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Admin Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/settings",
+            "description": "Returns the singleton static settings content."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Admin Settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"termsAndConditions\": \"Terms content\",\n  \"privacyPolicy\": \"Privacy content\",\n  \"aboutUs\": \"About content\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/settings",
+            "description": "Updates singleton static settings content. Super-admin access required."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -2280,6 +2650,21 @@
     {
       "key": "passwordResetToken",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminManagedUserId",
+      "value": "507f1f77bcf86cd799439014",
+      "type": "string"
+    },
+    {
+      "key": "adminUserSearch",
+      "value": "john",
+      "type": "string"
+    },
+    {
+      "key": "adminProfileImageUrl",
+      "value": "https://example.com/profile.png",
       "type": "string"
     },
     {
