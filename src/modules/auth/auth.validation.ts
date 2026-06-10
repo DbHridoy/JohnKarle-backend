@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-const emailSchema = z.string().trim().toLowerCase().email().max(254);
+export const emailSchema = z.string().trim().toLowerCase().email().max(254);
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters long.")
   .max(128, "Password must be at most 128 characters long.")

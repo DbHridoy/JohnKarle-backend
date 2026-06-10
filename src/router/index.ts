@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Router as ExpressRouter } from "express";
 import { authRouter } from "../modules/auth/auth.routes.js";
+import { adminRouter } from "../modules/admin/admin.routes.js";
 // import { claimRouter } from "../modules/claims/claim.routes.js";
 // import { contractRouter } from "../modules/contracts/contract.routes.js";
 // import { dashboardRouter } from "../modules/dashboard/dashboard.routes.js";
@@ -26,6 +27,7 @@ apiRouter.get("/", (_req, res) => {
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/auth", authRouter);
+apiRouter.use("/admin", adminRouter);
 apiRouter.use("/trusted-contacts", trustedContactRouter);
 apiRouter.use("/legacy-access", legacyAccessRouter);
 apiRouter.use("/memory-vault", memoryVaultRouter);
