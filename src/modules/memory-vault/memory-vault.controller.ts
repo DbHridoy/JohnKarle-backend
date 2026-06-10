@@ -4,7 +4,7 @@ import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
 import * as memoryVaultService from "./memory-vault.service.js";
 import { ensureFilesAllowedForType, extractMemoryVaultFiles } from "./memory-vault.upload.js";
-import type { MemoryVaultParams } from "./memory-vault.validation.js";
+import type { MemoryVaultParams, MemoryVaultQuery } from "./memory-vault.validation.js";
 
 const requireAuthenticatedUser = (req: Express.Request) => {
   if (!req.user) {
@@ -32,7 +32,7 @@ export const createMemory: RequestHandler = asyncHandler(async (req, res) => {
 
 export const listMemories: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
-  const memories = await memoryVaultService.listMemories(user);
+  const memories = await memoryVaultService.listMemories(user, req.query as MemoryVaultQuery);
 
   res.status(200).json({
     success: true,
@@ -44,7 +44,7 @@ export const listMemories: RequestHandler = asyncHandler(async (req, res) => {
 
 export const getTimeline: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
-  const timeline = await memoryVaultService.getTimeline(user);
+  const timeline = await memoryVaultService.getTimeline(user, req.query as MemoryVaultQuery);
 
   res.status(200).json({
     success: true,

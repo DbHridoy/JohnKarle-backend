@@ -7,6 +7,7 @@ import * as memoryVaultController from "./memory-vault.controller.js";
 import {
   createMemoryVaultBodySchema,
   memoryVaultParamsSchema,
+  memoryVaultQuerySchema,
   updateMemoryVaultBodySchema,
 } from "./memory-vault.validation.js";
 import { memoryVaultUpload, normalizeMemoryVaultPayload } from "./memory-vault.upload.js";
@@ -15,8 +16,16 @@ export const memoryVaultRouter: ExpressRouter = Router();
 
 memoryVaultRouter.use(authenticate, trackAuthenticatedUserActivity);
 
-memoryVaultRouter.get("/", memoryVaultController.listMemories);
-memoryVaultRouter.get("/timeline", memoryVaultController.getTimeline);
+memoryVaultRouter.get(
+  "/",
+  validateRequest({ query: memoryVaultQuerySchema }),
+  memoryVaultController.listMemories,
+);
+memoryVaultRouter.get(
+  "/timeline",
+  validateRequest({ query: memoryVaultQuerySchema }),
+  memoryVaultController.getTimeline,
+);
 memoryVaultRouter.get(
   "/:memoryId",
   validateRequest({ params: memoryVaultParamsSchema }),
