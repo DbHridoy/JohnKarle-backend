@@ -16,6 +16,7 @@ describe("app routes", () => {
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       success: true,
+      message: "Service health fetched successfully.",
       data: {
         status: "ok",
       },
@@ -32,9 +33,10 @@ describe("app routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "VALIDATION_ERROR",
-      },
+      message: "Validation failed",
+    });
+    expect(response.body.errors[0]).toMatchObject({
+      path: "email",
     });
   });
 
@@ -44,9 +46,8 @@ describe("app routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
+      errors: [{ code: "AUTH_REQUIRED", message: "Authentication token is required." }],
     });
   });
 
@@ -58,9 +59,7 @@ describe("app routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "VALIDATION_ERROR",
-      },
+      message: "Validation failed",
     });
   });
 
@@ -73,9 +72,7 @@ describe("app routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "VALIDATION_ERROR",
-      },
+      message: "Validation failed",
     });
   });
 
@@ -90,9 +87,7 @@ describe("app routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "VALIDATION_ERROR",
-      },
+      message: "Validation failed",
     });
   });
 });

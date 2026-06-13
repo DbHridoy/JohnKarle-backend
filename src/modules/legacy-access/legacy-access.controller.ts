@@ -2,6 +2,7 @@ import type { Request, RequestHandler } from "express";
 
 import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
+import { sendMessage, sendSuccess } from "../../utils/response.util.js";
 import * as legacyAccessService from "./legacy-access.service.js";
 
 const requireAuthenticatedUser = (req: Request) => {
@@ -25,9 +26,9 @@ export const updateLegacyAccessSettings: RequestHandler = asyncHandler(async (re
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: "Legacy access settings updated successfully.",
+    data: result.user,
   });
 });
 
@@ -35,11 +36,9 @@ export const listLegacyAccessRequests: RequestHandler = asyncHandler(async (req,
   const user = requireAuthenticatedUser(req);
   const requests = await legacyAccessService.listLegacyAccessRequestsForTrustedContact(user);
 
-  res.status(200).json({
-    success: true,
-    data: {
-      requests,
-    },
+  sendSuccess(res, {
+    message: "Legacy access requests fetched successfully.",
+    data: requests,
   });
 });
 
@@ -51,9 +50,9 @@ export const claimLegacyAccessRequest: RequestHandler = asyncHandler(async (req,
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: "Legacy access request claimed successfully.",
+    data: result.request,
   });
 });
 
@@ -65,9 +64,9 @@ export const getLegacyAccessData: RequestHandler = asyncHandler(async (req, res)
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: "Legacy access data fetched successfully.",
+    data: result.data,
   });
 });
 
@@ -79,8 +78,5 @@ export const cancelLegacyAccessRequest: RequestHandler = asyncHandler(async (req
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });
