@@ -32,7 +32,10 @@ export const createMemory: RequestHandler = asyncHandler(async (req, res) => {
 
 export const listMemories: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
-  const memories = await memoryVaultService.listMemories(user, req.query as MemoryVaultQuery);
+  const memories = await memoryVaultService.listMemories(
+    user,
+    req.validated?.query as MemoryVaultQuery | undefined,
+  );
 
   res.status(200).json({
     success: true,
@@ -44,7 +47,10 @@ export const listMemories: RequestHandler = asyncHandler(async (req, res) => {
 
 export const getTimeline: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
-  const timeline = await memoryVaultService.getTimeline(user, req.query as MemoryVaultQuery);
+  const timeline = await memoryVaultService.getTimeline(
+    user,
+    req.validated?.query as MemoryVaultQuery | undefined,
+  );
 
   res.status(200).json({
     success: true,

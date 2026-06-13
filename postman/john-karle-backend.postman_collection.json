@@ -2288,8 +2288,8 @@
                 "value": "Bearer {{accessToken}}"
               }
             ],
-            "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}",
-            "description": "Lists users for admin management with pagination and optional search by name, email, or phone."
+            "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}&role={{adminUserRole}}",
+            "description": "Lists users for admin management with pagination. Query params: page defaults to 1, limit defaults to 20 with a max of 100, search matches name/email/phone, and role filters by user role."
           },
           "response": [
             {
@@ -2309,9 +2309,9 @@
                     "value": "Bearer {{accessToken}}"
                   }
                 ],
-                "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}"
+                "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}&role={{adminUserRole}}"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"users\": [],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 20,\n      \"total\": 0,\n      \"totalPages\": 1\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"users\": [],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 20,\n      \"total\": 0,\n      \"totalPages\": 0,\n      \"hasNextPage\": false,\n      \"hasPrevPage\": false\n    }\n  }\n}"
             }
           ]
         },
@@ -2660,6 +2660,11 @@
     {
       "key": "adminUserSearch",
       "value": "john",
+      "type": "string"
+    },
+    {
+      "key": "adminUserRole",
+      "value": "user",
       "type": "string"
     },
     {
