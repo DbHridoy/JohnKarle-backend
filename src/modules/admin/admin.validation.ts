@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { emailSchema, passwordSchema } from "../auth/auth.validation.js";
+import { userRoles } from "../users/user.types.js";
 
 const objectIdSchema = z
   .string()
@@ -25,6 +26,7 @@ export const adminUserListQuerySchema = z
     page: positiveIntFromQuery(1).default(1),
     limit: positiveIntFromQuery(20).pipe(z.number().int().min(1).max(100)).default(20),
     search: z.string().trim().min(1).max(120).optional(),
+    role: z.enum(userRoles).optional(),
   })
   .strict();
 

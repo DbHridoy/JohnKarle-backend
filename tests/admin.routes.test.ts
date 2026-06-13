@@ -125,7 +125,9 @@ describe("admin routes", () => {
         page: 1,
         limit: 20,
         total: 0,
-        totalPages: 1,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
       },
     });
     getAdminUserByIdMock.mockResolvedValue({
@@ -255,6 +257,77 @@ describe("admin routes", () => {
   it("validates admin user id params", async () => {
     const response = await request(app)
       .get("/api/v1/admin/users/not-an-id")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("rejects unauthenticated user list requests", async () => {
+    const response = await request(app).get("/api/v1/admin/users");
+
+    expect(response.status).toBe(401);
+    expect(response.body.error.code).toBe("AUTH_REQUIRED");
+  });
+
+  it("rejects normal users from the user list route", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users")
+      .set(authHeadersFor("user-token"));
+
+    expect(response.status).toBe(403);
+    expect(response.body.error.code).toBe("FORBIDDEN");
+  });
+
+  it("uses validated default pagination on the user list route", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(200);
+    expect(listAdminUsersMock).toHaveBeenCalledWith({
+      page: 1,
+      limit: 20,
+    });
+    expect(response.body.data.pagination).toMatchObject({
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
+    });
+  });
+
+  it("coerces and forwards query filters without crashing on Express 5 getter-only req.query", async () => {
+    listAdminUsersMock.mockResolvedValueOnce({
+      users: [],
+      pagination: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: true,
+      },
+    });
+
+    const response = await request(app)
+      .get("/api/v1/admin/users?page=2&limit=10&search=john&role=admin")
+      .set(authHeadersFor("super-token"));
+
+    expect(response.status).toBe(200);
+    expect(listAdminUsersMock).toHaveBeenCalledWith({
+      page: 2,
+      limit: 10,
+      search: "john",
+      role: "admin",
+    });
+  });
+
+  it("validates admin user list query params", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users?page=0&limit=101&role=owner")
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(400);
