@@ -2,6 +2,7 @@ import type { Request, RequestHandler } from "express";
 
 import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
+import { sendCreated, sendMessage, sendSuccess } from "../../utils/response.util.js";
 import * as trustedContactService from "./trusted-contact.service.js";
 
 const requireAuthenticatedUser = (req: Request) => {
@@ -25,9 +26,9 @@ export const createTrustedContact: RequestHandler = asyncHandler(async (req, res
     getAuditContext(req),
   );
 
-  res.status(201).json({
-    success: true,
-    data: result,
+  sendCreated(res, {
+    message: result.message,
+    data: result.trustedContact,
   });
 });
 
@@ -35,11 +36,9 @@ export const listTrustedContacts: RequestHandler = asyncHandler(async (req, res)
   const user = requireAuthenticatedUser(req);
   const trustedContacts = await trustedContactService.listTrustedContacts(user);
 
-  res.status(200).json({
-    success: true,
-    data: {
-      trustedContacts,
-    },
+  sendSuccess(res, {
+    message: "Trusted contacts fetched successfully.",
+    data: trustedContacts,
   });
 });
 
@@ -52,9 +51,9 @@ export const updateTrustedContact: RequestHandler = asyncHandler(async (req, res
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: "Trusted contact updated successfully.",
+    data: result.trustedContact,
   });
 });
 
@@ -67,10 +66,7 @@ export const removeTrustedContact: RequestHandler = asyncHandler(async (req, res
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });
 
 export const getTrustedContactInvitation: RequestHandler = asyncHandler(async (req, res) => {
@@ -78,9 +74,9 @@ export const getTrustedContactInvitation: RequestHandler = asyncHandler(async (r
     (req.params as { token: string }).token,
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: "Trusted contact invitation fetched successfully.",
+    data: result.invitation,
   });
 });
 
@@ -90,9 +86,9 @@ export const acceptTrustedContactInvitation: RequestHandler = asyncHandler(async
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: result.message,
+    data: result.trustedContact,
   });
 });
 
@@ -102,8 +98,5 @@ export const declineTrustedContactInvitation: RequestHandler = asyncHandler(asyn
     getAuditContext(req),
   );
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });

@@ -12,12 +12,12 @@ import { memoryVaultRouter } from "../modules/memory-vault/memory-vault.routes.j
 // import { notificationRouter } from "../modules/notifications/notification.routes.js";
 import { trustedContactRouter } from "../modules/trusted-contacts/trusted-contact.routes.js";
 import { userRouter } from "../modules/users/user.routes.js";
+import { sendSuccess } from "../utils/response.util.js";
 
 export const apiRouter: ExpressRouter = Router();
 
 apiRouter.get("/", (_req, res) => {
-  res.status(200).json({
-    success: true,
+  sendSuccess(res, {
     message: "John Karle API v1",
     data: {
       health: "/api/v1/health",

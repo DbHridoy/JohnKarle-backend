@@ -2,6 +2,7 @@ import type { Request, RequestHandler } from "express";
 
 import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
+import { sendCreated, sendMessage, sendPaginated, sendSuccess } from "../../utils/response.util.js";
 import * as adminService from "./admin.service.js";
 import type {
   AdminUserIdParams,
@@ -24,8 +25,8 @@ const requireAuthenticatedUser = (req: Request) => {
 export const getDashboardMetrics: RequestHandler = asyncHandler(async (_req, res) => {
   const metrics = await adminService.getDashboardMetrics();
 
-  res.status(200).json({
-    success: true,
+  sendSuccess(res, {
+    message: "Dashboard metrics fetched successfully.",
     data: metrics,
   });
 });
@@ -33,31 +34,28 @@ export const getDashboardMetrics: RequestHandler = asyncHandler(async (_req, res
 export const listUsers: RequestHandler = asyncHandler(async (req, res) => {
   const result = await adminService.listAdminUsers(req.query as unknown as AdminUserListQuery);
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendPaginated(res, {
+    message: "Users fetched successfully.",
+    data: result.users,
+    meta: result.pagination,
   });
 });
 
 export const getUserById: RequestHandler = asyncHandler(async (req, res) => {
   const user = await adminService.getAdminUserById(req.params as AdminUserIdParams);
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user,
-    },
+  sendSuccess(res, {
+    message: "User fetched successfully.",
+    data: user,
   });
 });
 
 export const createAdmin: RequestHandler = asyncHandler(async (req, res) => {
   const user = await adminService.createAdminUser(req.body as CreateAdminInput);
 
-  res.status(201).json({
-    success: true,
-    data: {
-      user,
-    },
+  sendCreated(res, {
+    message: "Admin created successfully.",
+    data: user,
   });
 });
 
@@ -68,8 +66,8 @@ export const sendBulkEmail: RequestHandler = asyncHandler(async (req, res) => {
     req.body.message = "[Redacted]";
   }
 
-  res.status(200).json({
-    success: true,
+  sendSuccess(res, {
+    message: "Bulk email completed successfully.",
     data: result,
   });
 });
@@ -78,11 +76,9 @@ export const getProfile: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
   const profile = await adminService.getAdminProfile(user);
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user: profile,
-    },
+  sendSuccess(res, {
+    message: "Profile fetched successfully.",
+    data: profile,
   });
 });
 
@@ -94,11 +90,9 @@ export const updateProfile: RequestHandler = asyncHandler(async (req, res) => {
     req.file,
   );
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user: profile,
-    },
+  sendSuccess(res, {
+    message: "Profile updated successfully.",
+    data: profile,
   });
 });
 
@@ -106,20 +100,15 @@ export const changePassword: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
   const result = await adminService.changeAdminPassword(user, req.body as ChangeAdminPasswordInput);
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });
 
 export const getSettings: RequestHandler = asyncHandler(async (_req, res) => {
   const settings = await adminService.getAdminSettings();
 
-  res.status(200).json({
-    success: true,
-    data: {
-      settings,
-    },
+  sendSuccess(res, {
+    message: "Settings fetched successfully.",
+    data: settings,
   });
 });
 
@@ -130,10 +119,8 @@ export const updateSettings: RequestHandler = asyncHandler(async (req, res) => {
     req.body as UpdateAdminSettingsInput,
   );
 
-  res.status(200).json({
-    success: true,
-    data: {
-      settings,
-    },
+  sendSuccess(res, {
+    message: "Settings updated successfully.",
+    data: settings,
   });
 });
