@@ -83,11 +83,15 @@ describe("admin service", () => {
       updatedAt: new Date(),
     });
 
-    vi.spyOn(UserModel, "countDocuments").mockReturnValue(mockExecResolved(1) as never);
-    vi.spyOn(UserModel, "find").mockReturnValue({
-      sort: vi.fn().mockReturnValue({
-        skip: vi.fn().mockReturnValue({
-          limit: vi.fn().mockReturnValue(mockExecResolved([user])),
+    const countDocumentsSpy = vi
+      .spyOn(UserModel, "countDocuments")
+      .mockReturnValue(mockExecResolved(1) as never);
+    const findSpy = vi.spyOn(UserModel, "find").mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        sort: vi.fn().mockReturnValue({
+          skip: vi.fn().mockReturnValue({
+            limit: vi.fn().mockReturnValue(mockExecResolved([user])),
+          }),
         }),
       }),
     } as never);
@@ -96,18 +100,68 @@ describe("admin service", () => {
       page: 2,
       limit: 10,
       search: "john",
+      role: "user",
     });
 
     expect(result.pagination).toMatchObject({
       page: 2,
       limit: 10,
       total: 1,
+      totalPages: 1,
+      hasNextPage: false,
+      hasPrevPage: true,
+    });
+    expect(countDocumentsSpy).toHaveBeenCalledWith({
+      $or: [
+        { name: { $regex: "john", $options: "i" } },
+        { email: { $regex: "john", $options: "i" } },
+        { phoneNumber: { $regex: "john", $options: "i" } },
+      ],
+      role: "user",
+    });
+    expect(findSpy).toHaveBeenCalledWith({
+      $or: [
+        { name: { $regex: "john", $options: "i" } },
+        { email: { $regex: "john", $options: "i" } },
+        { phoneNumber: { $regex: "john", $options: "i" } },
+      ],
+      role: "user",
     });
     expect(result.users[0]).toMatchObject({
       email: "john@example.com",
       name: "John Doe",
     });
     expect(result.users[0]).not.toHaveProperty("passwordHash");
+  });
+
+  it("returns empty pagination metadata when no users match", async () => {
+    vi.spyOn(UserModel, "countDocuments").mockReturnValue(mockExecResolved(0) as never);
+    vi.spyOn(UserModel, "find").mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        sort: vi.fn().mockReturnValue({
+          skip: vi.fn().mockReturnValue({
+            limit: vi.fn().mockReturnValue(mockExecResolved([])),
+          }),
+        }),
+      }),
+    } as never);
+
+    const result = await adminService.listAdminUsers({
+      page: 1,
+      limit: 20,
+    });
+
+    expect(result).toEqual({
+      users: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
   });
 
   it("returns sanitized user detail and 404s when missing", async () => {
