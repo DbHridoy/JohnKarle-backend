@@ -32,7 +32,11 @@ export const getDashboardMetrics: RequestHandler = asyncHandler(async (_req, res
 });
 
 export const listUsers: RequestHandler = asyncHandler(async (req, res) => {
-  const result = await adminService.listAdminUsers(req.query as unknown as AdminUserListQuery);
+  const query = (req.validated?.query as AdminUserListQuery | undefined) ?? {
+    page: 1,
+    limit: 20,
+  };
+  const result = await adminService.listAdminUsers(query);
 
   sendPaginated(res, {
     message: "Users fetched successfully.",

@@ -29,6 +29,7 @@
  *   get:
  *     tags: [Admin]
  *     summary: List users for admin management
+ *     description: Returns a paginated, newest-first list of sanitized users. Supports optional search by name, email, or phone number, and optional role filtering.
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -37,19 +38,66 @@
  *         schema:
  *           type: integer
  *           minimum: 1
+ *           default: 1
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
  *           minimum: 1
  *           maximum: 100
+ *           default: 20
  *       - in: query
  *         name: search
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [user, admin, super_admin]
  *     responses:
  *       200:
  *         description: Users retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Users fetched successfully.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 20
+ *                     total:
+ *                       type: integer
+ *                       example: 42
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
+ *                     hasNextPage:
+ *                       type: boolean
+ *                       example: true
+ *                     hasPrevPage:
+ *                       type: boolean
+ *                       example: false
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Admin access required
  */
 
 /**
