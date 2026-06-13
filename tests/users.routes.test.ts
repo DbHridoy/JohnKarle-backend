@@ -16,9 +16,7 @@ describe("user profile routes", () => {
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "VALIDATION_ERROR",
-      },
+      message: "Validation failed",
     });
   });
 
@@ -28,9 +26,8 @@ describe("user profile routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
+      errors: [{ code: "AUTH_REQUIRED", message: "Authentication token is required." }],
     });
   });
 
@@ -45,9 +42,7 @@ describe("user profile routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
     });
   });
 
@@ -60,9 +55,7 @@ describe("user profile routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
     });
   });
 
@@ -72,9 +65,7 @@ describe("user profile routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
     });
   });
 
@@ -84,9 +75,7 @@ describe("user profile routes", () => {
     expect(response.status).toBe(401);
     expect(response.body).toMatchObject({
       success: false,
-      error: {
-        code: "AUTH_REQUIRED",
-      },
+      message: "Authentication token is required.",
     });
   });
 });

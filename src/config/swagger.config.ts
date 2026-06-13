@@ -35,22 +35,43 @@ const options: swaggerJsdoc.Options = {
           type: "object",
           properties: {
             success: { type: "boolean", example: true },
+            message: { type: "string", example: "Operation completed successfully." },
             data: { type: "object" },
+          },
+        },
+        PaginatedResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            message: { type: "string", example: "Users fetched successfully." },
+            data: {
+              type: "array",
+              items: { type: "object" },
+            },
+            meta: {
+              type: "object",
+              properties: {
+                page: { type: "integer", example: 1 },
+                limit: { type: "integer", example: 20 },
+                total: { type: "integer", example: 100 },
+                totalPages: { type: "integer", example: 5 },
+              },
+            },
           },
         },
         ErrorResponse: {
           type: "object",
           properties: {
             success: { type: "boolean", example: false },
-            error: {
-              type: "object",
-              properties: {
-                code: { type: "string", example: "VALIDATION_ERROR" },
-                message: { type: "string", example: "Request validation failed." },
-                details: {
-                  type: "object",
-                  nullable: true,
-                  description: "Additional error context (Zod issues, key values, etc.)",
+            message: { type: "string", example: "Validation failed" },
+            errors: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  code: { type: "string", example: "VALIDATION_ERROR" },
+                  path: { type: "string", example: "email" },
+                  message: { type: "string", example: "Invalid email" },
                 },
               },
             },

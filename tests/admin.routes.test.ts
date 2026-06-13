@@ -125,7 +125,9 @@ describe("admin routes", () => {
         page: 1,
         limit: 20,
         total: 0,
-        totalPages: 1,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
       },
     });
     getAdminUserByIdMock.mockResolvedValue({
@@ -216,7 +218,10 @@ describe("admin routes", () => {
     const response = await request(app).get("/api/v1/admin/dashboard/metrics");
 
     expect(response.status).toBe(401);
-    expect(response.body.error.code).toBe("AUTH_REQUIRED");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Authentication token is required.",
+    });
   });
 
   it("rejects normal users from metrics route", async () => {
@@ -225,7 +230,10 @@ describe("admin routes", () => {
       .set(authHeadersFor("user-token"));
 
     expect(response.status).toBe(403);
-    expect(response.body.error.code).toBe("FORBIDDEN");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "You do not have permission to access this resource.",
+    });
   });
 
   it("allows admins on metrics route", async () => {
@@ -234,9 +242,13 @@ describe("admin routes", () => {
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(200);
-    expect(response.body.data).toMatchObject({
-      totalUsers: 10,
-      totalActiveProfiles: 4,
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Dashboard metrics fetched successfully.",
+      data: {
+        totalUsers: 10,
+        totalActiveProfiles: 4,
+      },
     });
   });
 
@@ -246,9 +258,13 @@ describe("admin routes", () => {
       .set(authHeadersFor("super-token"));
 
     expect(response.status).toBe(200);
-    expect(response.body.data).toMatchObject({
-      totalUsers: 10,
-      totalActiveProfiles: 4,
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Dashboard metrics fetched successfully.",
+      data: {
+        totalUsers: 10,
+        totalActiveProfiles: 4,
+      },
     });
   });
 
@@ -258,7 +274,106 @@ describe("admin routes", () => {
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(400);
-    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
+  });
+
+  it("rejects unauthenticated user list requests", async () => {
+    const response = await request(app).get("/api/v1/admin/users");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Authentication token is required.",
+    });
+  });
+
+  it("rejects normal users from the user list route", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users")
+      .set(authHeadersFor("user-token"));
+
+    expect(response.status).toBe(403);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "You do not have permission to access this resource.",
+    });
+  });
+
+  it("uses validated default pagination on the user list route", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(200);
+    expect(listAdminUsersMock).toHaveBeenCalledWith({
+      page: 1,
+      limit: 20,
+    });
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Users fetched successfully.",
+      data: [],
+      meta: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
+  });
+
+  it("coerces and forwards query filters without crashing on Express 5 getter-only req.query", async () => {
+    listAdminUsersMock.mockResolvedValueOnce({
+      users: [],
+      pagination: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: true,
+      },
+    });
+
+    const response = await request(app)
+      .get("/api/v1/admin/users?page=2&limit=10&search=john&role=admin")
+      .set(authHeadersFor("super-token"));
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Users fetched successfully.",
+      data: [],
+      meta: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+      },
+    });
+    expect(listAdminUsersMock).toHaveBeenCalledWith({
+      page: 2,
+      limit: 10,
+      search: "john",
+      role: "admin",
+    });
+  });
+
+  it("validates admin user list query params", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/users?page=0&limit=101&role=owner")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
   });
 
   it("returns 404 for a missing user detail", async () => {
@@ -271,7 +386,10 @@ describe("admin routes", () => {
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(404);
-    expect(response.body.error.code).toBe("USER_NOT_FOUND");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "User not found.",
+    });
   });
 
   it("rejects admins from the create admin route", async () => {
@@ -285,7 +403,10 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(403);
-    expect(response.body.error.code).toBe("FORBIDDEN");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "You do not have permission to access this resource.",
+    });
   });
 
   it("allows super admins to create admins", async () => {
@@ -299,9 +420,13 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(201);
-    expect(response.body.data.user).toMatchObject({
-      email: "admin.user@example.com",
-      role: "admin",
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Admin created successfully.",
+      data: {
+        email: "admin.user@example.com",
+        role: "admin",
+      },
     });
   });
 
@@ -317,7 +442,10 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
   });
 
   it("validates empty bulk-email recipients", async () => {
@@ -331,7 +459,10 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
   });
 
   it("reads admin profile for admins", async () => {
@@ -340,7 +471,13 @@ describe("admin routes", () => {
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(200);
-    expect(response.body.data.user.email).toBe("admin@example.com");
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Profile fetched successfully.",
+      data: {
+        email: "admin@example.com",
+      },
+    });
   });
 
   it("rejects weak password changes", async () => {
@@ -353,7 +490,10 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
   });
 
   it("allows admins to read settings", async () => {
@@ -362,7 +502,10 @@ describe("admin routes", () => {
       .set(authHeadersFor("admin-token"));
 
     expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Settings fetched successfully.",
+    });
   });
 
   it("rejects admins from patching settings", async () => {
@@ -374,7 +517,10 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(403);
-    expect(response.body.error.code).toBe("FORBIDDEN");
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "You do not have permission to access this resource.",
+    });
   });
 
   it("allows super admins to patch settings", async () => {
@@ -386,6 +532,12 @@ describe("admin routes", () => {
       });
 
     expect(response.status).toBe(200);
-    expect(response.body.data.settings.aboutUs).toBe("About text");
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Settings updated successfully.",
+      data: {
+        aboutUs: "About text",
+      },
+    });
   });
 });
