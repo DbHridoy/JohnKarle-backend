@@ -82,6 +82,10 @@ export const createApp = (): express.Express => {
     });
   });
 
+  app.get("/favicon.ico", (_req, res) => {
+    res.status(204).end();
+  });
+
   app.use("/api/v1", apiRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);

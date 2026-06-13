@@ -45,7 +45,6 @@ const userFamilyMembershipSchema = new Schema<UserFamilyMembership, UserFamilyMe
       type: String,
       required: true,
       trim: true,
-      index: true,
     },
     status: {
       type: String,

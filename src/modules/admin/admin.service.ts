@@ -65,21 +65,32 @@ export const listAdminUsers = async (query: AdminUserListQuery) => {
   const limit = query.limit ?? 20;
   const skip = (page - 1) * limit;
   const search = query.search?.trim();
-  const filter =
-    search === undefined
-      ? {}
-      : {
-          $or: [
-            { name: { $regex: escapeRegExp(search), $options: "i" } },
-            { email: { $regex: escapeRegExp(search), $options: "i" } },
-            { phoneNumber: { $regex: escapeRegExp(search), $options: "i" } },
-          ],
-        };
+  const filter: Record<string, unknown> = {};
+
+  if (search !== undefined) {
+    filter.$or = [
+      { name: { $regex: escapeRegExp(search), $options: "i" } },
+      { email: { $regex: escapeRegExp(search), $options: "i" } },
+      { phoneNumber: { $regex: escapeRegExp(search), $options: "i" } },
+    ];
+  }
+
+  if (query.role !== undefined) {
+    filter.role = query.role;
+  }
 
   const [total, users] = await Promise.all([
     UserModel.countDocuments(filter).exec(),
-    UserModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+    UserModel.find(filter)
+      .select(
+        "name phoneNumber email role isEmailVerified address profilePicture familyMembers preferences legacyAccessEnabled lastActiveAt lastLoginAt createdAt updatedAt",
+      )
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec(),
   ]);
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
 
   return {
     users: users.map(toPublicUser),
@@ -87,7 +98,9 @@ export const listAdminUsers = async (query: AdminUserListQuery) => {
       page,
       limit,
       total,
-      totalPages: Math.max(1, Math.ceil(total / limit)),
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
     },
   };
 };
