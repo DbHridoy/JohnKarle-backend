@@ -13,6 +13,12 @@ type MongoDuplicateKeyError = Error & {
   keyValue?: Record<string, unknown>;
 };
 
+type ResponseError = {
+  code?: string;
+  message: string;
+  path?: string;
+};
+
 const isDuplicateKeyError = (error: unknown): error is MongoDuplicateKeyError =>
   error instanceof Error && "code" in error && (error as MongoDuplicateKeyError).code === 11000;
 
@@ -27,6 +33,10 @@ const normalizeError = (error: unknown): ApiError => {
 
   if (error instanceof mongoose.Error.ValidationError) {
     return new ApiError(400, "Database validation failed.", "DATABASE_VALIDATION_ERROR");
+  }
+
+  if (error instanceof mongoose.Error.CastError) {
+    return new ApiError(400, `Invalid ${error.path}.`, "INVALID_IDENTIFIER");
   }
 
   if (error instanceof multer.MulterError) {
@@ -48,12 +58,82 @@ const normalizeError = (error: unknown): ApiError => {
   return new ApiError(500, "Internal server error.", "INTERNAL_SERVER_ERROR");
 };
 
+const toValidationErrors = (details: unknown): ResponseError[] => {
+  if (!Array.isArray(details)) {
+    return [];
+  }
+
+  return details
+    .map((issue) => {
+      if (
+        typeof issue === "object" &&
+        issue !== null &&
+        "message" in issue &&
+        typeof issue.message === "string"
+      ) {
+        const path =
+          "path" in issue && Array.isArray(issue.path)
+            ? issue.path.map((segment: unknown) => String(segment)).join(".")
+            : undefined;
+
+        return {
+          ...(path ? { path } : {}),
+          message: issue.message,
+        };
+      }
+
+      return null;
+    })
+    .filter((issue): issue is ResponseError => issue !== null);
+};
+
+const toDuplicateKeyErrors = (details: unknown): ResponseError[] => {
+  if (!details || typeof details !== "object") {
+    return [];
+  }
+
+  return Object.keys(details).map((key) => ({
+    code: "DUPLICATE_RESOURCE",
+    path: key,
+    message: `${key} already exists.`,
+  }));
+};
+
+const buildErrorResponse = (apiError: ApiError): { message: string; errors: ResponseError[] } => {
+  if (apiError.code === "VALIDATION_ERROR") {
+    return {
+      message: "Validation failed",
+      errors: toValidationErrors(apiError.details),
+    };
+  }
+
+  if (apiError.code === "DUPLICATE_RESOURCE") {
+    return {
+      message: apiError.message,
+      errors: toDuplicateKeyErrors(apiError.details),
+    };
+  }
+
+  if (apiError.code === "DATABASE_VALIDATION_ERROR") {
+    return {
+      message: "Validation failed",
+      errors: [],
+    };
+  }
+
+  return {
+    message: apiError.message,
+    errors: apiError.statusCode >= 500 ? [] : [{ code: apiError.code, message: apiError.message }],
+  };
+};
+
 export const notFoundHandler: RequestHandler = (req, _res, next) => {
   next(new ApiError(404, `Route ${req.method} ${req.originalUrl} not found.`, "ROUTE_NOT_FOUND"));
 };
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   const apiError = normalizeError(error);
+  const responseBody = buildErrorResponse(apiError);
 
   if (apiError.statusCode >= 500) {
     logger.error({ err: error, method: req.method, path: req.originalUrl }, apiError.message);
@@ -61,11 +141,8 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
 
   res.status(apiError.statusCode).json({
     success: false,
-    error: {
-      code: apiError.code,
-      message: apiError.message,
-      ...(apiError.details === undefined ? {} : { details: apiError.details }),
-      ...(env.NODE_ENV === "development" ? { stack: apiError.stack } : {}),
-    },
+    message: responseBody.message,
+    errors: responseBody.errors,
+    ...(env.NODE_ENV === "development" ? { stack: apiError.stack } : {}),
   });
 };

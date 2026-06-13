@@ -2,13 +2,14 @@ import type { RequestHandler } from "express";
 
 import { ApiError } from "../../utils/api-error.util.js";
 import { asyncHandler } from "../../utils/async-handler.util.js";
+import { sendCreated, sendMessage, sendNoContent, sendSuccess } from "../../utils/response.util.js";
 import * as authService from "./auth.service.js";
 
 export const register: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.register(req.body);
 
-  res.status(201).json({
-    success: true,
+  sendCreated(res, {
+    message: "Account created successfully.",
     data: result,
   });
 });
@@ -16,8 +17,8 @@ export const register: RequestHandler = asyncHandler(async (req, res) => {
 export const login: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body);
 
-  res.status(200).json({
-    success: true,
+  sendSuccess(res, {
+    message: "Login successful.",
     data: result,
   });
 });
@@ -25,8 +26,8 @@ export const login: RequestHandler = asyncHandler(async (req, res) => {
 export const refresh: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.refresh(req.body);
 
-  res.status(200).json({
-    success: true,
+  sendSuccess(res, {
+    message: "Token refreshed successfully.",
     data: result,
   });
 });
@@ -34,28 +35,24 @@ export const refresh: RequestHandler = asyncHandler(async (req, res) => {
 export const requestPasswordResetCode: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.requestPasswordResetCode(req.body);
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });
 
 export const verifyPasswordResetCode: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.verifyPasswordResetCode(req.body);
 
-  res.status(200).json({
-    success: true,
-    data: result,
+  sendSuccess(res, {
+    message: result.message,
+    data: {
+      resetToken: result.resetToken,
+    },
   });
 });
 
 export const resetPassword: RequestHandler = asyncHandler(async (req, res) => {
   const result = await authService.resetPassword(req.body);
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+  sendMessage(res, result.message);
 });
 
 export const me: RequestHandler = asyncHandler(async (req, res) => {
@@ -65,11 +62,9 @@ export const me: RequestHandler = asyncHandler(async (req, res) => {
 
   const user = await authService.getProfile(req.user.id);
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user,
-    },
+  sendSuccess(res, {
+    message: "Profile fetched successfully.",
+    data: user,
   });
 });
 
@@ -79,5 +74,5 @@ export const logout: RequestHandler = asyncHandler(async (req, res) => {
   }
 
   await authService.logout(req.user.id);
-  res.status(204).send();
+  sendNoContent(res);
 });

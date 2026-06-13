@@ -10,6 +10,7 @@ import { swaggerSpec } from "./config/swagger.config.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import { requestLogger } from "./middleware/request-logger.middleware.js";
 import { apiRouter } from "./router/index.js";
+import { sendNoContent, sendSuccess } from "./utils/response.util.js";
 
 const parseCorsOrigin = (value: string): CorsOptions["origin"] => {
   if (value === "*") {
@@ -63,8 +64,8 @@ export const createApp = (): express.Express => {
   app.use(["/docs", "/api-docs"], swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
   app.get("/health", (_req, res) => {
-    res.status(200).json({
-      success: true,
+    sendSuccess(res, {
+      message: "Service health fetched successfully.",
       data: {
         service: "john-karle-backend",
         status: "ok",
@@ -73,8 +74,8 @@ export const createApp = (): express.Express => {
   });
 
   app.get("/", (_req, res) => {
-    res.status(200).json({
-      success: true,
+    sendSuccess(res, {
+      message: "Service status fetched successfully.",
       data: {
         service: "john-karle-backend",
         status: "ok",
@@ -82,6 +83,9 @@ export const createApp = (): express.Express => {
     });
   });
 
+  app.get("/favicon.ico", (_req, res) => {
+    sendNoContent(res);
+  });
   app.use("/api/v1", apiRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);
