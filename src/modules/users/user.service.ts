@@ -5,6 +5,7 @@ import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
+import { createNotification } from "../notifications/notification.service.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { toPublicUser } from "./user.presenter.js";
 import {
@@ -333,6 +334,20 @@ export const createInvitation = async (
     throw error;
   }
 
+  void createNotification({
+    recipient: invitedUser._id,
+    actor: inviter._id,
+    type: "family_invitation_received",
+    title: "Family invitation received",
+    message: `${inviter.name} invited you to join as a family member.`,
+    data: {
+      invitationId: invitation._id.toString(),
+      inviterId: inviter._id.toString(),
+      relation: invitation.relation,
+      role: invitation.role,
+    },
+  }).catch(() => undefined);
+
   return {
     invitation: {
       email: input.email,
@@ -385,6 +400,18 @@ export const acceptInvitation = async (input: AcceptInvitationInput) => {
   }
 
   await finalizeAcceptedInvitation(invitation, invitedUser, inviter);
+
+  void createNotification({
+    recipient: inviter._id,
+    actor: invitedUser._id,
+    type: "family_invitation_accepted",
+    title: "Family invitation accepted",
+    message: `${invitedUser.name} accepted your family invitation.`,
+    data: {
+      invitationId: invitation._id.toString(),
+      invitedUserId: invitedUser._id.toString(),
+    },
+  }).catch(() => undefined);
 
   return {
     email: invitedUser.email,
@@ -449,6 +476,18 @@ export const acceptInvitationById = async (
   }
 
   await finalizeAcceptedInvitation(invitation, invitedUser, inviter);
+
+  void createNotification({
+    recipient: inviter._id,
+    actor: invitedUser._id,
+    type: "family_invitation_accepted",
+    title: "Family invitation accepted",
+    message: `${invitedUser.name} accepted your family invitation.`,
+    data: {
+      invitationId: invitation._id.toString(),
+      invitedUserId: invitedUser._id.toString(),
+    },
+  }).catch(() => undefined);
 
   return {
     email: invitedUser.email,
