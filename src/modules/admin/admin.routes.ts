@@ -5,6 +5,14 @@ import { authenticate, authorizeAdmin, authorizeSuperAdmin } from "../auth/auth.
 import { trackAuthenticatedUserActivity } from "../legacy-access/legacy-access.activity.js";
 import * as notificationController from "../notifications/notification.controller.js";
 import { adminBroadcastBodySchema } from "../notifications/notification.validation.js";
+import * as reportFeedbackController from "../report-feedback/report-feedback.controller.js";
+import { reportFeedbackUpload } from "../report-feedback/report-feedback.upload.js";
+import {
+  adminReportFeedbackListQuerySchema,
+  createReportFeedbackReplyBodySchema,
+  reportFeedbackIdParamsSchema,
+  updateReportFeedbackStatusBodySchema,
+} from "../report-feedback/report-feedback.validation.js";
 import { userProfileUpload } from "../users/user.upload.js";
 import * as adminController from "./admin.controller.js";
 import {
@@ -51,6 +59,35 @@ adminRouter.post(
   authorizeAdmin,
   validateRequest({ body: adminBroadcastBodySchema }),
   notificationController.createAdminBroadcast,
+);
+adminRouter.get(
+  "/report-feedback",
+  authorizeAdmin,
+  validateRequest({ query: adminReportFeedbackListQuerySchema }),
+  reportFeedbackController.listAdminReportFeedback,
+);
+adminRouter.get(
+  "/report-feedback/:reportId",
+  authorizeAdmin,
+  validateRequest({ params: reportFeedbackIdParamsSchema }),
+  reportFeedbackController.getAdminReportFeedback,
+);
+adminRouter.post(
+  "/report-feedback/:reportId/replies",
+  authorizeAdmin,
+  validateRequest({ params: reportFeedbackIdParamsSchema }),
+  reportFeedbackUpload,
+  validateRequest({ body: createReportFeedbackReplyBodySchema }),
+  reportFeedbackController.addAdminReportFeedbackReply,
+);
+adminRouter.patch(
+  "/report-feedback/:reportId/status",
+  authorizeAdmin,
+  validateRequest({
+    params: reportFeedbackIdParamsSchema,
+    body: updateReportFeedbackStatusBodySchema,
+  }),
+  reportFeedbackController.updateAdminReportFeedbackStatus,
 );
 adminRouter.get("/profile", authorizeAdmin, adminController.getProfile);
 adminRouter.patch(
