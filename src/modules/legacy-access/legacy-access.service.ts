@@ -1,6 +1,7 @@
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { sendTransactionalEmail } from "../../utils/mail.util.js";
+import { createNotification } from "../notifications/notification.service.js";
 import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { requireRecentPasswordReauth } from "../auth/auth.reauth.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
@@ -302,6 +303,20 @@ export const claimLegacyAccessRequest = async (
     userAgent: audit.userAgent,
   });
 
+  if (owner) {
+    void createNotification({
+      recipient: owner._id,
+      actor: authenticatedUser.id,
+      type: "legacy_access_request_approved",
+      title: "Legacy access request approved",
+      message: `${trustedContact.name} has been granted your legacy access request.`,
+      data: {
+        requestId: request._id.toString(),
+        trustedContactId: trustedContact._id.toString(),
+      },
+    }).catch(() => undefined);
+  }
+
   return {
     request: toPublicLegacyAccessRequest(request, trustedContact),
   };
@@ -530,6 +545,36 @@ export const runLegacyAccessDailyJob = async (): Promise<{
           expiresAt: expiresAt.toISOString(),
         },
       });
+
+      void createNotification({
+        recipient: user._id,
+        type: "legacy_access_request_created",
+        title: "Legacy access waiting period started",
+        message: `${trustedContact.name} may be eligible for legacy access after the waiting period.`,
+        data: {
+          requestId: request._id.toString(),
+          trustedContactId: trustedContact._id.toString(),
+          unlockAt: unlockAt.toISOString(),
+        },
+      }).catch(() => undefined);
+
+      const trustedContactUser = await UserModel.findOne({ email: trustedContact.email })
+        .select("_id")
+        .exec();
+
+      if (trustedContactUser) {
+        void createNotification({
+          recipient: trustedContactUser._id,
+          type: "legacy_access_request_created",
+          title: "Legacy access request created",
+          message: `A legacy access review for ${user.name} has started.`,
+          data: {
+            requestId: request._id.toString(),
+            userId: user._id.toString(),
+            unlockAt: unlockAt.toISOString(),
+          },
+        }).catch(() => undefined);
+      }
 
       triggeredCount += 1;
     }

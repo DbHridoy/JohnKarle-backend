@@ -6,9 +6,14 @@ process.env.JWT_SECRET = "test-secret-with-enough-length-for-auth-tests";
 process.env.LOG_LEVEL = "silent";
 
 const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
+const createNotificationMock = vi.fn().mockResolvedValue(null);
 
 vi.mock("../src/utils/mail.util.js", () => ({
   sendTransactionalEmail: sendTransactionalEmailMock,
+}));
+
+vi.mock("../src/modules/notifications/notification.service.js", () => ({
+  createNotification: createNotificationMock,
 }));
 
 const userService = await import("../src/modules/users/user.service.js");
@@ -29,6 +34,7 @@ describe("user family invitations and memberships", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     sendTransactionalEmailMock.mockClear();
+    createNotificationMock.mockClear();
   });
 
   it("creates a pending family-member invitation for an existing user", async () => {

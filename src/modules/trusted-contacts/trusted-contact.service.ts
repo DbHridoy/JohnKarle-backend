@@ -2,6 +2,7 @@ import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
+import { createNotification } from "../notifications/notification.service.js";
 import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { requireRecentPasswordReauth } from "../auth/auth.reauth.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
@@ -174,6 +175,24 @@ export const createTrustedContact = async (
     userAgent: audit.userAgent,
   });
 
+  const recipientUser = await UserModel.findOne({ email: trustedContact.email })
+    .select("_id")
+    .exec();
+
+  if (recipientUser) {
+    void createNotification({
+      recipient: recipientUser._id,
+      actor: owner._id,
+      type: "trusted_contact_invitation_received",
+      title: "Trusted contact invitation received",
+      message: `${owner.name} added you as a trusted contact.`,
+      data: {
+        trustedContactId: trustedContact._id.toString(),
+        ownerId: owner._id.toString(),
+      },
+    }).catch(() => undefined);
+  }
+
   return {
     trustedContact: toPublicTrustedContact(trustedContact),
     message: "Trusted contact added successfully.",
@@ -234,6 +253,16 @@ export const updateTrustedContact = async (
     ipAddress: audit.ipAddress,
     userAgent: audit.userAgent,
   });
+
+  void createNotification({
+    recipient: trustedContact.userId,
+    type: "trusted_contact_invitation_accepted",
+    title: "Trusted contact invitation accepted",
+    message: `${trustedContact.name} accepted your trusted contact invitation.`,
+    data: {
+      trustedContactId: trustedContact._id.toString(),
+    },
+  }).catch(() => undefined);
 
   return {
     trustedContact: toPublicTrustedContact(trustedContact),
