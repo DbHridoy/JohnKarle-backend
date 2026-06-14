@@ -8,6 +8,7 @@ process.env.LOG_LEVEL = "silent";
 const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
 const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 const reauthMock = vi.fn().mockResolvedValue(undefined);
+const createNotificationMock = vi.fn().mockResolvedValue(null);
 
 vi.mock("../src/utils/mail.util.js", () => ({
   sendTransactionalEmail: sendTransactionalEmailMock,
@@ -19,6 +20,10 @@ vi.mock("../src/modules/audit-logs/audit-log.service.js", () => ({
 
 vi.mock("../src/modules/auth/auth.reauth.js", () => ({
   requireRecentPasswordReauth: reauthMock,
+}));
+
+vi.mock("../src/modules/notifications/notification.service.js", () => ({
+  createNotification: createNotificationMock,
 }));
 
 const { LegacyAccessRequestModel } =
@@ -34,12 +39,17 @@ const mockExecResolved = <T>(value: T) => ({
   exec: vi.fn().mockResolvedValue(value),
 });
 
+const mockSelectExecResolved = <T>(value: T) => ({
+  select: vi.fn().mockReturnValue(mockExecResolved(value)),
+});
+
 describe("legacy access service", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     sendTransactionalEmailMock.mockClear();
     createAuditLogMock.mockClear();
     reauthMock.mockClear();
+    createNotificationMock.mockClear();
   });
 
   it("creates waiting-period requests for inactive users and avoids duplicates", async () => {
@@ -85,6 +95,7 @@ describe("legacy access service", () => {
     });
 
     vi.spyOn(UserModel, "find").mockReturnValue(mockExecResolved([user]) as never);
+    vi.spyOn(UserModel, "findOne").mockReturnValue(mockSelectExecResolved(null) as never);
     vi.spyOn(TrustedContactModel, "find").mockReturnValue(
       mockExecResolved([trustedContact]) as never,
     );

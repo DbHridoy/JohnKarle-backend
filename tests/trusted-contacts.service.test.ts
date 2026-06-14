@@ -8,6 +8,7 @@ process.env.LOG_LEVEL = "silent";
 const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
 const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 const reauthMock = vi.fn().mockResolvedValue(undefined);
+const createNotificationMock = vi.fn().mockResolvedValue(null);
 
 vi.mock("../src/utils/mail.util.js", () => ({
   sendTransactionalEmail: sendTransactionalEmailMock,
@@ -21,6 +22,10 @@ vi.mock("../src/modules/auth/auth.reauth.js", () => ({
   requireRecentPasswordReauth: reauthMock,
 }));
 
+vi.mock("../src/modules/notifications/notification.service.js", () => ({
+  createNotification: createNotificationMock,
+}));
+
 const { TrustedContactModel } =
   await import("../src/modules/trusted-contacts/trusted-contact.model.js");
 const trustedContactService =
@@ -32,12 +37,17 @@ const mockExecResolved = <T>(value: T) => ({
   exec: vi.fn().mockResolvedValue(value),
 });
 
+const mockSelectExecResolved = <T>(value: T) => ({
+  select: vi.fn().mockReturnValue(mockExecResolved(value)),
+});
+
 describe("trusted contact service", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     sendTransactionalEmailMock.mockClear();
     createAuditLogMock.mockClear();
     reauthMock.mockClear();
+    createNotificationMock.mockClear();
   });
 
   it("allows a user to add a trusted contact and stores only a hashed token", async () => {
@@ -51,6 +61,7 @@ describe("trusted contact service", () => {
         name: "Owner",
       }) as never,
     );
+    vi.spyOn(UserModel, "findOne").mockReturnValue(mockSelectExecResolved(null) as never);
     vi.spyOn(TrustedContactModel, "exists").mockReturnValue(mockExecResolved(null) as never);
     const createSpy = vi
       .spyOn(TrustedContactModel, "create")
