@@ -3,6 +3,8 @@ import { Router, type Router as ExpressRouter } from "express";
 import { validateRequest } from "../../middleware/validate-request.middleware.js";
 import { authenticate, authorizeAdmin, authorizeSuperAdmin } from "../auth/auth.middleware.js";
 import { trackAuthenticatedUserActivity } from "../legacy-access/legacy-access.activity.js";
+import * as notificationController from "../notifications/notification.controller.js";
+import { adminBroadcastBodySchema } from "../notifications/notification.validation.js";
 import { userProfileUpload } from "../users/user.upload.js";
 import * as adminController from "./admin.controller.js";
 import {
@@ -43,6 +45,12 @@ adminRouter.post(
   authorizeAdmin,
   validateRequest({ body: bulkEmailBodySchema }),
   adminController.sendBulkEmail,
+);
+adminRouter.post(
+  "/notifications/broadcast",
+  authorizeAdmin,
+  validateRequest({ body: adminBroadcastBodySchema }),
+  notificationController.createAdminBroadcast,
 );
 adminRouter.get("/profile", authorizeAdmin, adminController.getProfile);
 adminRouter.patch(
