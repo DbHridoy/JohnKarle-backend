@@ -2231,6 +2231,216 @@
       ]
     },
     {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/notifications?page=1&limit=20&isRead=false&type=system&priority=normal",
+            "description": "Lists the authenticated user's in-app notifications. Supports page and limit pagination, plus optional isRead, type, and priority filters."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/notifications?page=1&limit=20&isRead=false&type=system&priority=normal"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Notifications fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"{{notificationId}}\",\n      \"type\": \"system\",\n      \"title\": \"Welcome\",\n      \"message\": \"Your account is ready.\",\n      \"data\": {\n        \"source\": \"system\"\n      },\n      \"isRead\": false,\n      \"priority\": \"normal\",\n      \"createdAt\": \"2026-06-15T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-15T00:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/notifications/unread-count",
+            "description": "Returns the unread notification count for the authenticated user."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/notifications/unread-count"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Unread notification count fetched successfully.\",\n  \"data\": {\n    \"count\": 3\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark Notification Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/notifications/{{notificationId}}/read",
+            "description": "Marks a single owned notification as read."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/notifications/{{notificationId}}/read"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Notification marked as read.\",\n  \"data\": {\n    \"id\": \"{{notificationId}}\",\n    \"type\": \"system\",\n    \"title\": \"Welcome\",\n    \"message\": \"Your account is ready.\",\n    \"isRead\": true,\n    \"readAt\": \"2026-06-15T00:10:00.000Z\",\n    \"priority\": \"normal\",\n    \"createdAt\": \"2026-06-15T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-15T00:10:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mark All Notifications Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/notifications/read-all",
+            "description": "Marks all owned unread notifications as read."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/notifications/read-all"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"All notifications marked as read.\",\n  \"data\": {\n    \"updatedCount\": 5\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/notifications/{{notificationId}}",
+            "description": "Deletes a single owned notification."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/notifications/{{notificationId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Notification deleted successfully.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Admin",
       "item": [
         {
@@ -2459,6 +2669,59 @@
                 "url": "{{apiV1BaseUrl}}/admin/bulk-email"
               },
               "body": "{\n  \"success\": true,\n  \"data\": {\n    \"requestedCount\": 1,\n    \"sentCount\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Broadcast Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientIds\": [\"{{adminManagedUserId}}\"],\n  \"title\": \"Service update\",\n  \"message\": \"A new feature is now available.\",\n  \"type\": \"admin_broadcast\",\n  \"priority\": \"normal\",\n  \"data\": {\n    \"section\": \"announcements\"\n  }\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/notifications/broadcast",
+            "description": "Creates in-app notifications for selected users, or use sendToAll=true to target all normal users."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/notifications/broadcast"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Admin broadcast created successfully.\",\n  \"data\": {\n    \"requestedCount\": 1,\n    \"createdCount\": 1\n  }\n}"
             }
           ]
         },
@@ -2749,6 +3012,11 @@
     },
     {
       "key": "familyInvitationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
       "value": "",
       "type": "string"
     }
