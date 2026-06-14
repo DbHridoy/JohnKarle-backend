@@ -38,7 +38,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Service health fetched successfully.\",\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
             }
           ]
         },
@@ -71,7 +71,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Server is healthy\",\n  \"data\": {\n    \"uptime\": 12345.678,\n    \"timestamp\": \"2026-06-15T00:00:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -129,7 +129,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Service status fetched successfully.\",\n  \"data\": {\n    \"service\": \"john-karle-backend\",\n    \"status\": \"ok\"\n  }\n}"
             }
           ]
         },
@@ -162,7 +162,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"message\": \"Nicholas Cook9 API v1\",\n  \"data\": {\n    \"health\": \"/api/v1/health\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"John Karle API v1\",\n  \"data\": {\n    \"health\": \"/api/v1/health\"\n  }\n}"
             }
           ]
         },
@@ -270,7 +270,7 @@
               "status": "Created",
               "code": 201,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Account created successfully.\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:00:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
             }
           ]
         },
@@ -337,7 +337,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"lastLoginAt\": \"2026-06-09T00:05:00.000Z\",\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"lastLoginAt\": \"2026-06-09T00:05:00.000Z\",\n      \"lastActiveAt\": \"2026-06-09T00:05:00.000Z\",\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
             }
           ]
         },
@@ -404,7 +404,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Token refreshed successfully.\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    },\n    \"tokens\": {\n      \"accessToken\": \"<access-token>\",\n      \"refreshToken\": \"<refresh-token>\",\n      \"tokenType\": \"Bearer\",\n      \"expiresIn\": \"15m\"\n    }\n  }\n}"
             }
           ]
         },
@@ -456,7 +456,7 @@
                   "status": "OK",
                   "code": 200,
                   "_postman_previewlanguage": "json",
-                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"If an account exists for this email, a password reset code has been sent.\"\n  }\n}"
+                  "body": "{\n  \"success\": true,\n  \"message\": \"If an account exists for this email, a password reset code has been sent.\"\n}"
                 }
               ]
             },
@@ -522,7 +522,7 @@
                   "status": "OK",
                   "code": 200,
                   "_postman_previewlanguage": "json",
-                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Password reset code verified successfully.\",\n    \"resetToken\": \"<reset-token>\"\n  }\n}"
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Password reset code verified successfully.\",\n  \"data\": {\n    \"resetToken\": \"<reset-token>\"\n  }\n}"
                 }
               ]
             },
@@ -571,7 +571,7 @@
                   "status": "OK",
                   "code": 200,
                   "_postman_previewlanguage": "json",
-                  "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Password has been reset successfully.\"\n  }\n}"
+                  "body": "{\n  \"success\": true,\n  \"message\": \"Password has been reset successfully.\"\n}"
                 }
               ]
             }
@@ -626,7 +626,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"role\": \"editor\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -737,7 +737,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\",\n          \"relation\": \"brother\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"role\": \"editor\",\n        \"relation\": \"brother\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -860,7 +860,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"phoneNumber\": \"+8801712345678\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": false,\n      \"address\": \"123 Main Street, Dhaka\",\n      \"profilePicture\": {\n        \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n        \"originalName\": \"avatar.jpg\",\n        \"mimeType\": \"image/jpeg\",\n        \"size\": 102400\n      },\n      \"familyMembers\": [\n        {\n          \"name\": \"Jane Doe\",\n          \"email\": \"jane@example.com\",\n          \"role\": \"editor\",\n          \"relation\": \"brother\"\n        }\n      ],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-09T00:15:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile updated successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"role\": \"editor\",\n        \"relation\": \"brother\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:15:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -2032,7 +2032,7 @@
                 },
                 "url": "{{apiV1BaseUrl}}/legacy-access/settings"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"user-id\",\n      \"email\": \"demo.user@example.com\",\n      \"legacyAccessEnabled\": true\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Legacy access settings updated successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"familyMembers\": [],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": true,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:20:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -2085,7 +2085,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/legacy-access/requests"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"requests\": [\n      {\n        \"id\": \"legacy-request-id\",\n        \"userId\": \"user-id\",\n        \"trustedContactId\": \"trusted-contact-id\",\n        \"trustedContact\": {\n          \"id\": \"trusted-contact-id\",\n          \"name\": \"Trusted Contact\",\n          \"email\": \"trusted.contact@example.com\",\n          \"status\": \"accepted\",\n          \"accessScope\": {\n            \"profile\": true,\n            \"documents\": false,\n            \"notes\": true,\n            \"messages\": false,\n            \"paymentInfo\": false,\n            \"accountTransfer\": false\n          }\n        },\n        \"status\": \"waiting_period\",\n        \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n        \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n        \"expiresAt\": \"2026-07-24T00:00:00.000Z\",\n        \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Legacy access requests fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"legacy-request-id\",\n      \"userId\": \"user-id\",\n      \"trustedContactId\": \"trusted-contact-id\",\n      \"trustedContact\": {\n        \"id\": \"trusted-contact-id\",\n        \"name\": \"Trusted Contact\",\n        \"email\": \"trusted.contact@example.com\",\n        \"status\": \"accepted\",\n        \"accessScope\": {\n          \"profile\": true,\n          \"documents\": false,\n          \"notes\": true,\n          \"messages\": false,\n          \"paymentInfo\": false,\n          \"accountTransfer\": false\n        }\n      },\n      \"status\": \"waiting_period\",\n      \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n      \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n      \"expiresAt\": \"2026-07-24T00:00:00.000Z\",\n      \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n    }\n  ]\n}"
             }
           ]
         },
@@ -2134,7 +2134,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/claim"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"request\": {\n      \"id\": \"legacy-request-id\",\n      \"status\": \"approved\",\n      \"approvedAt\": \"2026-06-24T00:00:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Legacy access request claimed successfully.\",\n  \"data\": {\n    \"id\": \"legacy-request-id\",\n    \"userId\": \"user-id\",\n    \"trustedContactId\": \"trusted-contact-id\",\n    \"trustedContact\": {\n      \"id\": \"trusted-contact-id\",\n      \"name\": \"Trusted Contact\",\n      \"email\": \"trusted.contact@example.com\",\n      \"status\": \"accepted\",\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": false,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      }\n    },\n    \"status\": \"approved\",\n    \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n    \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n    \"expiresAt\": \"2026-07-24T00:00:00.000Z\",\n    \"approvedAt\": \"2026-06-24T00:00:00.000Z\",\n    \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-24T00:00:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -2175,7 +2175,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/data"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"data\": {\n      \"request\": {\n        \"id\": \"legacy-request-id\",\n        \"status\": \"approved\",\n        \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n        \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n        \"approvedAt\": \"2026-06-24T12:00:00.000Z\"\n      },\n      \"owner\": {\n        \"id\": \"user-id\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo.user@example.com\"\n      },\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": false,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"profile\": {\n        \"id\": \"user-id\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo.user@example.com\",\n        \"role\": \"user\",\n        \"isEmailVerified\": true,\n        \"familyMembers\": [],\n        \"preferences\": {\n          \"notifications\": true,\n          \"aiInsight\": true,\n          \"darkMode\": false,\n          \"anonymousAnalytics\": true\n        },\n        \"legacyAccessEnabled\": true,\n        \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      },\n      \"notes\": [\n        {\n          \"id\": \"memory-id\",\n          \"type\": \"journal\",\n          \"title\": \"Legacy note\",\n          \"narrative\": \"Visible note\",\n          \"whoseMemoryIsThis\": \"Demo User\",\n          \"files\": [],\n          \"date\": \"2026-06-01T00:00:00.000Z\",\n          \"tags\": [],\n          \"createdAt\": \"2026-06-01T00:00:00.000Z\",\n          \"updatedAt\": \"2026-06-01T00:00:00.000Z\"\n        }\n      ]\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Legacy access data fetched successfully.\",\n  \"data\": {\n    \"request\": {\n      \"id\": \"legacy-request-id\",\n      \"status\": \"approved\",\n      \"triggeredAt\": \"2026-06-10T00:00:00.000Z\",\n      \"unlockAt\": \"2026-06-24T00:00:00.000Z\",\n      \"approvedAt\": \"2026-06-24T12:00:00.000Z\"\n    },\n    \"owner\": {\n      \"id\": \"user-id\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\"\n    },\n    \"accessScope\": {\n      \"profile\": true,\n      \"documents\": false,\n      \"notes\": true,\n      \"messages\": false,\n      \"paymentInfo\": false,\n      \"accountTransfer\": false\n    },\n    \"profile\": {\n      \"id\": \"user-id\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": true,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": true,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n    },\n    \"notes\": [\n      {\n        \"id\": \"memory-id\",\n        \"type\": \"journal\",\n        \"title\": \"Legacy note\",\n        \"narrative\": \"Visible note\",\n        \"whoseMemoryIsThis\": \"Demo User\",\n        \"files\": [],\n        \"date\": \"2026-06-01T00:00:00.000Z\",\n        \"tags\": [],\n        \"createdAt\": \"2026-06-01T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-01T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
             }
           ]
         },
@@ -2224,9 +2224,184 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/legacy-access/{{legacyAccessRequestId}}/cancel"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"Legacy access request cancelled.\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Legacy access request cancelled.\"\n}"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Report Feedback",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "type",
+                  "value": "problem",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "technical",
+                  "type": "text"
+                },
+                {
+                  "key": "subject",
+                  "value": "Cannot upload a file",
+                  "type": "text"
+                },
+                {
+                  "key": "message",
+                  "value": "I cannot upload a file from the memory vault page.",
+                  "type": "text"
+                },
+                {
+                  "key": "priority",
+                  "value": "medium",
+                  "type": "text"
+                },
+                {
+                  "key": "attachments",
+                  "type": "file",
+                  "src": "/absolute/path/to/report-attachment.txt"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/report-feedback",
+            "description": "Creates a report or feedback item for the authenticated user with up to 5 optional attachments."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/report-feedback"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Report created successfully.\",\n  \"data\": {\n    \"id\": \"{{reportFeedbackId}}\",\n    \"userId\": \"507f1f77bcf86cd799439013\",\n    \"type\": \"problem\",\n    \"category\": \"technical\",\n    \"subject\": \"Cannot upload a file\",\n    \"message\": \"I cannot upload a file from the memory vault page.\",\n    \"priority\": \"medium\",\n    \"status\": \"open\",\n    \"attachments\": [],\n    \"replies\": [],\n    \"createdAt\": \"2026-06-15T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-15T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List My Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/report-feedback/my?page=1&limit=20&type=problem&status=open&priority=high",
+            "description": "Lists the authenticated user's own reports with pagination and optional type/status/priority filters."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/report-feedback/my?page=1&limit=20&type=problem&status=open&priority=high"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Reports fetched successfully.\",\n  \"data\": [],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 0,\n    \"totalPages\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Report By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/report-feedback/{{reportFeedbackId}}",
+            "description": "Gets a single report. Users can only access their own report."
+          },
+          "response": []
+        },
+        {
+          "name": "Add User Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "message",
+                  "value": "Any update on this issue?",
+                  "type": "text"
+                },
+                {
+                  "key": "attachments",
+                  "type": "file",
+                  "src": "/absolute/path/to/reply-attachment.txt"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/report-feedback/{{reportFeedbackId}}/replies",
+            "description": "Adds a follow-up reply to an owned report unless it has already been closed."
+          },
+          "response": []
         }
       ]
     },
@@ -2270,7 +2445,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/notifications?page=1&limit=20&isRead=false&type=system&priority=normal"
               },
-              "body": "{\n  \"success\": true,\n  \"message\": \"Notifications fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"{{notificationId}}\",\n      \"type\": \"system\",\n      \"title\": \"Welcome\",\n      \"message\": \"Your account is ready.\",\n      \"data\": {\n        \"source\": \"system\"\n      },\n      \"isRead\": false,\n      \"priority\": \"normal\",\n      \"createdAt\": \"2026-06-15T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-15T00:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Notifications fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"{{notificationId}}\",\n      \"type\": \"system\",\n      \"title\": \"Welcome\",\n      \"message\": \"Your account is ready.\",\n      \"data\": {\n        \"source\": \"system\"\n      },\n      \"isRead\": false,\n      \"priority\": \"normal\",\n      \"createdAt\": \"2026-06-15T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-15T00:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1,\n    \"hasNextPage\": false,\n    \"hasPrevPage\": false\n  }\n}"
             }
           ]
         },
@@ -2393,7 +2568,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/notifications/read-all"
               },
-              "body": "{\n  \"success\": true,\n  \"message\": \"All notifications marked as read.\",\n  \"data\": {\n    \"updatedCount\": 5\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"All notifications marked as read.\",\n  \"data\": {\n    \"modifiedCount\": 5\n  }\n}"
             }
           ]
         },
@@ -2480,7 +2655,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/admin/dashboard/metrics"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totalUsers\": 42,\n    \"totalActiveProfiles\": 18\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Dashboard metrics fetched successfully.\",\n  \"data\": {\n    \"totalUsers\": 42,\n    \"totalActiveProfiles\": 18\n  }\n}"
             }
           ]
         },
@@ -2521,7 +2696,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/admin/users?page=1&limit=20&search={{adminUserSearch}}&role={{adminUserRole}}"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"users\": [],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 20,\n      \"total\": 0,\n      \"totalPages\": 0,\n      \"hasNextPage\": false,\n      \"hasPrevPage\": false\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Users fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Demo User\",\n      \"email\": \"demo.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": true,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1,\n    \"hasNextPage\": false,\n    \"hasPrevPage\": false\n  }\n}"
             }
           ]
         },
@@ -2562,7 +2737,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/admin/users/{{adminManagedUserId}}"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"{{adminManagedUserId}}\",\n      \"name\": \"Managed User\",\n      \"email\": \"managed.user@example.com\",\n      \"role\": \"user\",\n      \"isEmailVerified\": true,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"User fetched successfully.\",\n  \"data\": {\n    \"id\": \"{{adminManagedUserId}}\",\n    \"name\": \"Managed User\",\n    \"email\": \"managed.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": true,\n    \"familyMembers\": [],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -2615,7 +2790,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/admin/admins"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"id\": \"507f1f77bcf86cd799439015\",\n      \"name\": \"Admin User\",\n      \"email\": \"admin.user@example.com\",\n      \"role\": \"admin\",\n      \"isEmailVerified\": false,\n      \"familyMembers\": [],\n      \"preferences\": {\n        \"notifications\": true,\n        \"aiInsight\": true,\n        \"darkMode\": false,\n        \"anonymousAnalytics\": true\n      },\n      \"legacyAccessEnabled\": false,\n      \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Admin created successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"name\": \"Admin User\",\n    \"email\": \"admin.user@example.com\",\n    \"role\": \"admin\",\n    \"isEmailVerified\": false,\n    \"familyMembers\": [],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -2668,9 +2843,130 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/admin/bulk-email"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"requestedCount\": 1,\n    \"sentCount\": 1\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Bulk email completed successfully.\",\n  \"data\": {\n    \"requestedCount\": 1,\n    \"sentCount\": 1\n  }\n}"
             }
           ]
+        },
+        {
+          "name": "List Report Feedback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/report-feedback?page=1&limit=20&status=open&type=problem&priority=high&userId={{adminManagedUserId}}&search=upload",
+            "description": "Lists all reports for admins with pagination and filters for status, type, priority, userId, and search."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/report-feedback?page=1&limit=20&status=open&type=problem&priority=high&userId={{adminManagedUserId}}&search=upload"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Reports fetched successfully.\",\n  \"data\": [],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 0,\n    \"totalPages\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Report Feedback By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/report-feedback/{{reportFeedbackId}}",
+            "description": "Gets a single report in admin context, including its user summary and replies."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Admin Report Reply",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "message",
+                  "value": "We are checking this now.",
+                  "type": "text"
+                },
+                {
+                  "key": "attachments",
+                  "type": "file",
+                  "src": "/absolute/path/to/admin-reply-attachment.txt"
+                }
+              ]
+            },
+            "url": "{{apiV1BaseUrl}}/admin/report-feedback/{{reportFeedbackId}}/replies",
+            "description": "Adds an admin reply and automatically moves an open report to in_progress."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Report Feedback Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/report-feedback/{{reportFeedbackId}}/status",
+            "description": "Updates the report status. Allowed values are open, in_progress, resolved, and closed."
+          },
+          "response": []
         },
         {
           "name": "Broadcast Notification",
@@ -2742,7 +3038,29 @@
             "url": "{{apiV1BaseUrl}}/admin/profile",
             "description": "Returns the authenticated admin or super-admin profile."
           },
-          "response": []
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/profile"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"name\": \"Admin User\",\n    \"email\": \"admin.user@example.com\",\n    \"role\": \"admin\",\n    \"isEmailVerified\": true,\n    \"familyMembers\": [],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Update Admin Profile",
@@ -2786,7 +3104,54 @@
             "url": "{{apiV1BaseUrl}}/admin/profile",
             "description": "Updates the authenticated admin profile. Email is read-only. You may also upload a profilePicture file instead of using profileImage."
           },
-          "response": []
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Admin Updated",
+                      "type": "text"
+                    },
+                    {
+                      "key": "phone",
+                      "value": "+1234567890",
+                      "type": "text"
+                    },
+                    {
+                      "key": "address",
+                      "value": "Updated Admin Address",
+                      "type": "text"
+                    },
+                    {
+                      "key": "profileImage",
+                      "value": "{{adminProfileImageUrl}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": "{{apiV1BaseUrl}}/admin/profile"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile updated successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439015\",\n    \"name\": \"Admin Updated\",\n    \"phoneNumber\": \"+1234567890\",\n    \"email\": \"admin.user@example.com\",\n    \"role\": \"admin\",\n    \"isEmailVerified\": true,\n    \"address\": \"Updated Admin Address\",\n    \"familyMembers\": [],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:10:00.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Change Admin Password",
@@ -2813,7 +3178,37 @@
             "url": "{{apiV1BaseUrl}}/admin/profile/password",
             "description": "Changes the authenticated admin or super-admin password."
           },
-          "response": []
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\": \"{{userPassword}}\",\n  \"newPassword\": \"{{newUserPassword}}\"\n}"
+                },
+                "url": "{{apiV1BaseUrl}}/admin/profile/password"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Password updated successfully.\"\n}"
+            }
+          ]
         },
         {
           "name": "Get Admin Settings",
@@ -2832,7 +3227,29 @@
             "url": "{{apiV1BaseUrl}}/admin/settings",
             "description": "Returns the singleton static settings content."
           },
-          "response": []
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/settings"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Settings fetched successfully.\",\n  \"data\": {\n    \"termsAndConditions\": \"Terms content\",\n    \"privacyPolicy\": \"Privacy content\",\n    \"aboutUs\": \"About content\",\n    \"updatedBy\": \"507f1f77bcf86cd799439015\",\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Update Admin Settings",
@@ -2859,7 +3276,37 @@
             "url": "{{apiV1BaseUrl}}/admin/settings",
             "description": "Updates singleton static settings content. Super-admin access required."
           },
-          "response": []
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"termsAndConditions\": \"Terms content\",\n  \"privacyPolicy\": \"Privacy content\",\n  \"aboutUs\": \"About content\"\n}"
+                },
+                "url": "{{apiV1BaseUrl}}/admin/settings"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "body": "{\n  \"success\": true,\n  \"message\": \"Settings updated successfully.\",\n  \"data\": {\n    \"termsAndConditions\": \"Terms content\",\n    \"privacyPolicy\": \"Privacy content\",\n    \"aboutUs\": \"About content\",\n    \"updatedBy\": \"507f1f77bcf86cd799439015\",\n    \"createdAt\": \"2026-06-11T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:10:00.000Z\"\n  }\n}"
+            }
+          ]
         }
       ]
     }
@@ -3017,6 +3464,11 @@
     },
     {
       "key": "notificationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reportFeedbackId",
       "value": "",
       "type": "string"
     }
