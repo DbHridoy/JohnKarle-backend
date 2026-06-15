@@ -45,7 +45,51 @@ const getS3Client = (): S3Client => {
 const buildObjectUrl = (key: string): string =>
   `https://${env.S3_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
 
-export const userProfileUpload: RequestHandler = upload.single("profilePicture");
+export const userProfileUpload: RequestHandler = (req, res, next) => {
+  upload.any()(req, res, (error) => {
+    if (error) {
+      next(error);
+      return;
+    }
+
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    if (files.length === 0) {
+      next();
+      return;
+    }
+
+    if (files.length > 1) {
+      next(
+        new ApiError(
+          400,
+          "Provide only one profile image file using profilePicture or profileImage.",
+          "FILE_UPLOAD_ERROR",
+        ),
+      );
+      return;
+    }
+
+    const [file] = files;
+
+    if (!file) {
+      next();
+      return;
+    }
+
+    if (!["profilePicture", "profileImage"].includes(file.fieldname)) {
+      next(
+        new ApiError(400, `Unexpected file field: ${file.fieldname}.`, "FILE_UPLOAD_ERROR", {
+          field: file.fieldname,
+        }),
+      );
+      return;
+    }
+
+    req.file = file;
+    next();
+  });
+};
 
 export const uploadProfilePicture = async (
   userId: string,

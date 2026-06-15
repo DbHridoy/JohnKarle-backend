@@ -13,6 +13,10 @@ type MongoDuplicateKeyError = Error & {
   keyValue?: Record<string, unknown>;
 };
 
+type MulterFieldError = multer.MulterError & {
+  field?: string;
+};
+
 type ResponseError = {
   code?: string;
   message: string;
@@ -40,7 +44,15 @@ const normalizeError = (error: unknown): ApiError => {
   }
 
   if (error instanceof multer.MulterError) {
-    return new ApiError(400, error.message, "FILE_UPLOAD_ERROR");
+    const field = (error as MulterFieldError).field;
+
+    if (error.code === "LIMIT_UNEXPECTED_FILE" && field) {
+      return new ApiError(400, `Unexpected file field: ${field}.`, "FILE_UPLOAD_ERROR", { field });
+    }
+
+    return new ApiError(400, error.message, "FILE_UPLOAD_ERROR", {
+      ...(field ? { field } : {}),
+    });
   }
 
   if (isDuplicateKeyError(error)) {
@@ -118,6 +130,24 @@ const buildErrorResponse = (apiError: ApiError): { message: string; errors: Resp
     return {
       message: "Validation failed",
       errors: [],
+    };
+  }
+
+  if (apiError.code === "FILE_UPLOAD_ERROR") {
+    const field =
+      apiError.details && typeof apiError.details === "object" && "field" in apiError.details
+        ? (apiError.details as { field?: unknown }).field
+        : undefined;
+
+    return {
+      message: apiError.message,
+      errors: [
+        {
+          code: apiError.code,
+          ...(typeof field === "string" ? { path: field } : {}),
+          message: apiError.message,
+        },
+      ],
     };
   }
 
