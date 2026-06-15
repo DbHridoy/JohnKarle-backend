@@ -480,6 +480,42 @@ describe("admin routes", () => {
     });
   });
 
+  it("accepts profileImage as a file upload alias on admin profile updates", async () => {
+    const response = await request(app)
+      .patch("/api/v1/admin/profile")
+      .set(authHeadersFor("admin-token"))
+      .field("name", "Admin Updated")
+      .attach("profileImage", Buffer.from("image-bytes"), "avatar.png");
+
+    expect(response.status).toBe(200);
+    expect(updateAdminProfileMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "507f1f77bcf86cd799439011" }),
+      expect.objectContaining({ name: "Admin Updated" }),
+      expect.objectContaining({ originalname: "avatar.png" }),
+    );
+  });
+
+  it("reports the rejected file field name for invalid admin profile upload keys", async () => {
+    const response = await request(app)
+      .patch("/api/v1/admin/profile")
+      .set(authHeadersFor("admin-token"))
+      .field("name", "Admin Updated")
+      .attach("avatar", Buffer.from("image-bytes"), "avatar.png");
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Unexpected file field: avatar.",
+      errors: [
+        {
+          code: "FILE_UPLOAD_ERROR",
+          path: "avatar",
+          message: "Unexpected file field: avatar.",
+        },
+      ],
+    });
+  });
+
   it("rejects weak password changes", async () => {
     const response = await request(app)
       .patch("/api/v1/admin/profile/password")
