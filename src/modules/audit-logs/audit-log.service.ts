@@ -4,6 +4,9 @@ export type AuditLogInput = {
   userId: string;
   actorId?: string;
   actorType: AuditActorType;
+  targetType?: string;
+  targetId?: string;
+  targetLabel?: string;
   action: string;
   metadata?: Record<string, unknown>;
   ipAddress?: string;
@@ -17,6 +20,9 @@ export const createAuditLog = async (input: AuditLogInput): Promise<void> => {
     actorType: input.actorType,
     ipAddress: input.ipAddress,
     metadata: input.metadata ?? {},
+    targetId: input.targetId,
+    targetLabel: input.targetLabel,
+    targetType: input.targetType,
     userAgent: input.userAgent,
     userId: input.userId,
   });

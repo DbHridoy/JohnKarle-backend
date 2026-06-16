@@ -128,6 +128,7 @@ export const listFamilyMembersForUser = async (userId: string): Promise<FamilyMe
         userId: counterpartId,
         name: counterpart.name,
         email: counterpart.email,
+        ...(counterpart.profilePicture ? { profilePicture: counterpart.profilePicture } : {}),
         relation: isRequester
           ? (membership.requesterRelationship ?? "family")
           : (membership.recipientRelationship ?? "family"),

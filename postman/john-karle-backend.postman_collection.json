@@ -626,7 +626,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"role\": \"editor\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"userId\": \"507f1f77bcf86cd799439099\",\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"profilePicture\": {\n          \"key\": \"users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"originalName\": \"avatar.png\",\n          \"mimeType\": \"image/png\",\n          \"size\": 32145\n        },\n        \"relation\": \"sister\",\n        \"role\": \"editor\",\n        \"status\": \"accepted\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -737,7 +737,7 @@
               "status": "OK",
               "code": 200,
               "_postman_previewlanguage": "json",
-              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"role\": \"editor\",\n        \"relation\": \"brother\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Demo User\",\n    \"phoneNumber\": \"+8801712345678\",\n    \"email\": \"demo.user@example.com\",\n    \"role\": \"user\",\n    \"isEmailVerified\": false,\n    \"address\": \"123 Main Street, Dhaka\",\n    \"profilePicture\": {\n      \"key\": \"users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/1717891200000-avatar.jpg\",\n      \"originalName\": \"avatar.jpg\",\n      \"mimeType\": \"image/jpeg\",\n      \"size\": 102400\n    },\n    \"familyMembers\": [\n      {\n        \"userId\": \"507f1f77bcf86cd799439099\",\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"profilePicture\": {\n          \"key\": \"users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"originalName\": \"avatar.png\",\n          \"mimeType\": \"image/png\",\n          \"size\": 32145\n        },\n        \"role\": \"editor\",\n        \"relation\": \"brother\",\n        \"status\": \"accepted\"\n      }\n    ],\n    \"preferences\": {\n      \"notifications\": true,\n      \"aiInsight\": true,\n      \"darkMode\": false,\n      \"anonymousAnalytics\": true\n    },\n    \"legacyAccessEnabled\": false,\n    \"createdAt\": \"2026-06-09T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-09T00:05:00.000Z\"\n  }\n}"
             }
           ]
         },
@@ -890,10 +890,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"{{invitedUserName}}\",\n  \"email\": \"{{invitedUserEmail}}\",\n  \"role\": \"editor\"\n}"
+              "raw": "{\n  \"name\": \"{{invitedUserName}}\",\n  \"email\": \"{{invitedUserEmail}}\",\n  \"relation\": \"brother\",\n  \"role\": \"editor\"\n}"
             },
             "url": "{{apiV1BaseUrl}}/users/invitations",
-            "description": "Creates a family-member invitation. If the email belongs to an existing user, the relationship remains pending until acceptance."
+            "description": "Creates a family-member invitation. Existing users receive the invitation in-app only. New users receive the email onboarding invitation flow."
           },
           "response": [
             {
@@ -922,7 +922,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"role\": \"editor\"\n}"
+                  "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"relation\": \"brother\",\n  \"role\": \"editor\"\n}"
                 },
                 "url": "{{apiV1BaseUrl}}/users/invitations"
               },
@@ -1019,7 +1019,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/users/family-members"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"familyMembers\": [\n      {\n        \"userId\": \"507f1f77bcf86cd799439099\",\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"relation\": \"sister\",\n        \"role\": \"viewer\",\n        \"status\": \"accepted\"\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"familyMembers\": [\n      {\n        \"userId\": \"507f1f77bcf86cd799439099\",\n        \"name\": \"Jane Doe\",\n        \"email\": \"jane@example.com\",\n        \"profilePicture\": {\n          \"key\": \"users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439099/profile/avatar.png\",\n          \"originalName\": \"avatar.png\",\n          \"mimeType\": \"image/png\",\n          \"size\": 32145\n        },\n        \"relation\": \"sister\",\n        \"role\": \"viewer\",\n        \"status\": \"accepted\"\n      }\n    ]\n  }\n}"
             }
           ]
         },
@@ -1032,7 +1032,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "var json = pm.response.json();",
-                  "if (json.data && json.data.invitations && json.data.invitations[0]) { pm.collectionVariables.set('familyInvitationId', json.data.invitations[0].id); }"
+                  "if (Array.isArray(json.data) && json.data[0]) { pm.collectionVariables.set('familyInvitationId', json.data[0].id); }"
                 ]
               }
             }
@@ -1050,7 +1050,7 @@
               }
             ],
             "url": "{{apiV1BaseUrl}}/users/invitations",
-            "description": "Lists pending family-member invitations for the authenticated invitee."
+            "description": "Lists pending family-member invitations relevant to the authenticated user, including invitations they sent and invitations addressed to them."
           },
           "response": [
             {
@@ -1072,7 +1072,7 @@
                 ],
                 "url": "{{apiV1BaseUrl}}/users/invitations"
               },
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"invitations\": [\n      {\n        \"id\": \"family-invitation-id\",\n        \"inviterId\": \"507f1f77bcf86cd799439011\",\n        \"inviteeUserId\": \"507f1f77bcf86cd799439099\",\n        \"inviteeEmail\": \"jane@example.com\",\n        \"inviteeName\": \"Jane Doe\",\n        \"relation\": \"sister\",\n        \"role\": \"viewer\",\n        \"status\": \"pending\",\n        \"expiresAt\": \"2026-06-11T00:00:00.000Z\",\n        \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n        \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"message\": \"Invitations fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"family-invitation-id\",\n      \"inviterId\": \"507f1f77bcf86cd799439011\",\n      \"inviter\": {\n        \"id\": \"507f1f77bcf86cd799439011\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo.user@example.com\",\n        \"profilePicture\": {\n          \"key\": \"users/507f1f77bcf86cd799439011/profile/avatar.png\",\n          \"url\": \"https://your-bucket.s3.ap-southeast-2.amazonaws.com/users/507f1f77bcf86cd799439011/profile/avatar.png\",\n          \"originalName\": \"avatar.png\",\n          \"mimeType\": \"image/png\",\n          \"size\": 28123\n        }\n      },\n      \"direction\": \"received\",\n      \"inviteeUserId\": \"507f1f77bcf86cd799439099\",\n      \"inviteeEmail\": \"jane@example.com\",\n      \"inviteeName\": \"Jane Doe\",\n      \"relation\": \"sister\",\n      \"role\": \"viewer\",\n      \"status\": \"pending\",\n      \"expiresAt\": \"2026-06-11T00:00:00.000Z\",\n      \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n    }\n  ]\n}"
             }
           ]
         },
@@ -2660,6 +2660,47 @@
           ]
         },
         {
+          "name": "Recent Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/dashboard/recent-activities?page=1&limit=20&type={{adminActivityType}}&actorId={{adminActivityActorId}}&targetType={{adminActivityTargetType}}&targetId={{adminActivityTargetId}}&from={{adminActivityFrom}}&to={{adminActivityTo}}&search={{adminActivitySearch}}",
+            "description": "Returns a paginated, newest-first recent activity feed for the admin dashboard. Supports filtering by audit action type, actor, target, date range, and safe text search."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/dashboard/recent-activities?page=1&limit=20&type={{adminActivityType}}&actorId={{adminActivityActorId}}&targetType={{adminActivityTargetType}}&targetId={{adminActivityTargetId}}&from={{adminActivityFrom}}&to={{adminActivityTo}}&search={{adminActivitySearch}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Recent activities fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439020\",\n      \"type\": \"trusted_contact_added\",\n      \"message\": \"Trusted contact added\",\n      \"actor\": {\n        \"id\": \"507f1f77bcf86cd799439011\",\n        \"name\": \"Admin User\",\n        \"email\": \"admin@example.com\",\n        \"role\": \"admin\"\n      },\n      \"target\": {\n        \"type\": \"trusted_contact\",\n        \"id\": \"507f1f77bcf86cd799439021\",\n        \"label\": \"Trusted Contact\"\n      },\n      \"metadata\": {\n        \"email\": \"trusted.contact@example.com\"\n      },\n      \"createdAt\": \"2026-06-16T10:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1,\n    \"hasNextPage\": false,\n    \"hasPrevPage\": false\n  }\n}"
+            }
+          ]
+        },
+        {
           "name": "List Users",
           "request": {
             "method": "GET",
@@ -2844,6 +2885,235 @@
                 "url": "{{apiV1BaseUrl}}/admin/bulk-email"
               },
               "body": "{\n  \"success\": true,\n  \"message\": \"Bulk email completed successfully.\",\n  \"data\": {\n    \"requestedCount\": 1,\n    \"sentCount\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Email Template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateName\": \"Welcome Template\",\n  \"subjectLine\": \"Welcome to John Karle\",\n  \"content\": \"Hello {{name}}, welcome to John Karle.\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/email-templates",
+            "description": "Creates a reusable email template for admin-managed email content."
+          },
+          "response": [
+            {
+              "name": "Created",
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/email-templates"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Email template created successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439111\",\n    \"templateName\": \"Welcome Template\",\n    \"subjectLine\": \"Welcome to John Karle\",\n    \"content\": \"Hello {{name}}, welcome to John Karle.\",\n    \"createdBy\": \"507f1f77bcf86cd799439011\",\n    \"updatedBy\": \"507f1f77bcf86cd799439011\",\n    \"createdAt\": \"2026-06-16T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-16T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Email Templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/email-templates?page=1&limit=20&search={{emailTemplateSearch}}",
+            "description": "Lists email templates with pagination and optional search by template name, subject, or content."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/email-templates?page=1&limit=20&search={{emailTemplateSearch}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Email templates fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439111\",\n      \"templateName\": \"Welcome Template\",\n      \"subjectLine\": \"Welcome to John Karle\",\n      \"content\": \"Hello {{name}}, welcome to John Karle.\",\n      \"createdBy\": \"507f1f77bcf86cd799439011\",\n      \"updatedBy\": \"507f1f77bcf86cd799439011\",\n      \"createdAt\": \"2026-06-16T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-16T00:00:00.000Z\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"totalPages\": 1,\n    \"hasNextPage\": false,\n    \"hasPrevPage\": false\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Email Template By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}",
+            "description": "Fetches a single email template by id."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Email template fetched successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439111\",\n    \"templateName\": \"Welcome Template\",\n    \"subjectLine\": \"Welcome to John Karle\",\n    \"content\": \"Hello {{name}}, welcome to John Karle.\",\n    \"createdBy\": \"507f1f77bcf86cd799439011\",\n    \"updatedBy\": \"507f1f77bcf86cd799439011\",\n    \"createdAt\": \"2026-06-16T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-16T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Email Template",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectLine\": \"Updated Welcome Subject\",\n  \"content\": \"Updated content for {{name}}\"\n}"
+            },
+            "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}",
+            "description": "Updates an existing email template."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Email template updated successfully.\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439111\",\n    \"templateName\": \"Welcome Template\",\n    \"subjectLine\": \"Updated Welcome Subject\",\n    \"content\": \"Updated content for {{name}}\",\n    \"createdBy\": \"507f1f77bcf86cd799439011\",\n    \"updatedBy\": \"507f1f77bcf86cd799439011\",\n    \"createdAt\": \"2026-06-16T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-16T00:05:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Email Template",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}",
+            "description": "Deletes an email template."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/admin/email-templates/{{emailTemplateId}}"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Email template deleted successfully.\"\n}"
             }
           ]
         },
