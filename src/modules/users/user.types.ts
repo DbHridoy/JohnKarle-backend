@@ -18,6 +18,7 @@ export type FamilyMember = {
   userId?: string;
   name: string;
   email: string;
+  profilePicture?: UserProfilePicture;
   relation: string;
   role: FamilyMemberRole;
   status: FamilyMemberStatus;
