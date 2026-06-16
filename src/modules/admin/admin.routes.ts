@@ -16,11 +16,16 @@ import {
 import { userProfileUpload } from "../users/user.upload.js";
 import * as adminController from "./admin.controller.js";
 import {
+  adminRecentActivitiesQuerySchema,
   adminUserIdParamsSchema,
   adminUserListQuerySchema,
   bulkEmailBodySchema,
   changeAdminPasswordBodySchema,
+  createEmailTemplateBodySchema,
   createAdminBodySchema,
+  emailTemplateIdParamsSchema,
+  listEmailTemplatesQuerySchema,
+  updateEmailTemplateBodySchema,
   updateAdminProfileBodySchema,
   updateAdminSettingsBodySchema,
 } from "./admin.validation.js";
@@ -30,6 +35,12 @@ export const adminRouter: ExpressRouter = Router();
 adminRouter.use(authenticate, trackAuthenticatedUserActivity);
 
 adminRouter.get("/dashboard/metrics", authorizeAdmin, adminController.getDashboardMetrics);
+adminRouter.get(
+  "/dashboard/recent-activities",
+  authorizeAdmin,
+  validateRequest({ query: adminRecentActivitiesQuerySchema }),
+  adminController.getRecentActivities,
+);
 adminRouter.get(
   "/users",
   authorizeAdmin,
@@ -53,6 +64,39 @@ adminRouter.post(
   authorizeAdmin,
   validateRequest({ body: bulkEmailBodySchema }),
   adminController.sendBulkEmail,
+);
+adminRouter.post(
+  "/email-templates",
+  authorizeAdmin,
+  validateRequest({ body: createEmailTemplateBodySchema }),
+  adminController.createEmailTemplate,
+);
+adminRouter.get(
+  "/email-templates",
+  authorizeAdmin,
+  validateRequest({ query: listEmailTemplatesQuerySchema }),
+  adminController.listEmailTemplates,
+);
+adminRouter.get(
+  "/email-templates/:templateId",
+  authorizeAdmin,
+  validateRequest({ params: emailTemplateIdParamsSchema }),
+  adminController.getEmailTemplateById,
+);
+adminRouter.patch(
+  "/email-templates/:templateId",
+  authorizeAdmin,
+  validateRequest({
+    params: emailTemplateIdParamsSchema,
+    body: updateEmailTemplateBodySchema,
+  }),
+  adminController.updateEmailTemplate,
+);
+adminRouter.delete(
+  "/email-templates/:templateId",
+  authorizeAdmin,
+  validateRequest({ params: emailTemplateIdParamsSchema }),
+  adminController.deleteEmailTemplate,
 );
 adminRouter.post(
   "/notifications/broadcast",

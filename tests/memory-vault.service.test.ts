@@ -6,9 +6,14 @@ process.env.JWT_SECRET = "test-secret-with-enough-length-for-auth-tests";
 process.env.LOG_LEVEL = "silent";
 
 const areAcceptedFamilyMembersMock = vi.fn();
+const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../src/modules/users/user-family-membership.service.js", () => ({
   areAcceptedFamilyMembers: areAcceptedFamilyMembersMock,
+}));
+
+vi.mock("../src/modules/audit-logs/audit-log.service.js", () => ({
+  createAuditLog: createAuditLogMock,
 }));
 
 const memoryVaultService = await import("../src/modules/memory-vault/memory-vault.service.js");
@@ -22,6 +27,54 @@ describe("memory vault service", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     areAcceptedFamilyMembersMock.mockReset();
+    createAuditLogMock.mockClear();
+  });
+
+  it("writes an audit log when the owner creates a memory", async () => {
+    const ownerId = new Types.ObjectId();
+    const memoryId = new Types.ObjectId();
+    vi.spyOn(MemoryVaultModel, "create").mockResolvedValue({
+      _id: memoryId,
+      userId: ownerId,
+      type: "journal",
+      whoseMemoryIsThis: "Owner",
+      files: [],
+      title: "Entry",
+      narrative: "Story",
+      date: new Date("2026-06-10T00:00:00.000Z"),
+      tags: ["family"],
+      createdAt: new Date("2026-06-10T00:00:00.000Z"),
+      updatedAt: new Date("2026-06-10T00:00:00.000Z"),
+    } as never);
+
+    const result = await memoryVaultService.createMemory(
+      {
+        id: ownerId.toString(),
+        email: "owner@example.com",
+        role: "user",
+        tokenVersion: 0,
+      },
+      {
+        type: "journal",
+        whoseMemoryIsThis: "Owner",
+        title: "Entry",
+        narrative: "Story",
+        date: new Date("2026-06-10T00:00:00.000Z"),
+        tags: ["family"],
+      },
+      [],
+    );
+
+    expect(result.id).toBe(memoryId.toString());
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: ownerId.toString(),
+        action: "memory_created",
+        targetType: "memory",
+        targetId: memoryId.toString(),
+        targetLabel: "Entry",
+      }),
+    );
   });
 
   it("allows list and timeline access for accepted family members", async () => {
@@ -210,5 +263,25 @@ describe("memory vault service", () => {
     expect(updated.title).toBe("Updated Entry");
     expect(ownedMemory.title).toBe("Updated Entry");
     expect(deleteOneSpy).toHaveBeenCalledWith({ _id: memoryId });
+    expect(createAuditLogMock).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        actorId: ownerId.toString(),
+        action: "memory_updated",
+        targetType: "memory",
+        targetId: memoryId.toString(),
+        targetLabel: "Updated Entry",
+      }),
+    );
+    expect(createAuditLogMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        actorId: ownerId.toString(),
+        action: "memory_deleted",
+        targetType: "memory",
+        targetId: memoryId.toString(),
+        targetLabel: "Updated Entry",
+      }),
+    );
   });
 });
