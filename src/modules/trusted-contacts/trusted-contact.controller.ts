@@ -42,6 +42,16 @@ export const listTrustedContacts: RequestHandler = asyncHandler(async (req, res)
   });
 });
 
+export const listTrustedContactInvitations: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const invitations = await trustedContactService.listTrustedContactInvitations(user);
+
+  sendSuccess(res, {
+    message: "Trusted contact invitations fetched successfully.",
+    data: invitations,
+  });
+});
+
 export const updateTrustedContact: RequestHandler = asyncHandler(async (req, res) => {
   const user = requireAuthenticatedUser(req);
   const result = await trustedContactService.updateTrustedContact(
@@ -79,6 +89,33 @@ export const getTrustedContactInvitation: RequestHandler = asyncHandler(async (r
     data: result.invitation,
   });
 });
+
+export const acceptTrustedContactInvitationById: RequestHandler = asyncHandler(async (req, res) => {
+  const user = requireAuthenticatedUser(req);
+  const result = await trustedContactService.acceptTrustedContactInvitationById(
+    user,
+    req.params as { id: string },
+    getAuditContext(req),
+  );
+
+  sendSuccess(res, {
+    message: result.message,
+    data: result.trustedContact,
+  });
+});
+
+export const declineTrustedContactInvitationById: RequestHandler = asyncHandler(
+  async (req, res) => {
+    const user = requireAuthenticatedUser(req);
+    const result = await trustedContactService.declineTrustedContactInvitationById(
+      user,
+      req.params as { id: string },
+      getAuditContext(req),
+    );
+
+    sendMessage(res, result.message);
+  },
+);
 
 export const acceptTrustedContactInvitation: RequestHandler = asyncHandler(async (req, res) => {
   const result = await trustedContactService.acceptTrustedContactInvitation(

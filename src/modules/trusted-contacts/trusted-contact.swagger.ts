@@ -50,6 +50,67 @@
 
 /**
  * @swagger
+ * /api/v1/trusted-contacts/invitations:
+ *   get:
+ *     tags: [Trusted Contacts]
+ *     summary: List pending trusted-contact invitations for the authenticated user
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trusted contact invitations retrieved
+ *       401:
+ *         description: Authentication required
+ */
+
+/**
+ * @swagger
+ * /api/v1/trusted-contacts/invitations/{id}/accept:
+ *   post:
+ *     tags: [Trusted Contacts]
+ *     summary: Accept a pending trusted-contact invitation in-app
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invitation accepted
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Invitation not found
+ */
+
+/**
+ * @swagger
+ * /api/v1/trusted-contacts/invitations/{id}/decline:
+ *   post:
+ *     tags: [Trusted Contacts]
+ *     summary: Decline a pending trusted-contact invitation in-app
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invitation declined
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Invitation not found
+ */
+
+/**
+ * @swagger
  * /api/v1/trusted-contacts/{id}:
  *   patch:
  *     tags: [Trusted Contacts]
