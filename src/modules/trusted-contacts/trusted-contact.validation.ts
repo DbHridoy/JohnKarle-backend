@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const trustedContactIdParamsSchema = z
   .object({
-    id: z.string().trim().min(1),
+    id: z
+      .string()
+      .trim()
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid trusted contact id."),
   })
   .strict();
 

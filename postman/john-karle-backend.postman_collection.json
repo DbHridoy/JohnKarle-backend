@@ -1746,6 +1746,129 @@
           ]
         },
         {
+          "name": "List Trusted Contact Invitations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations",
+            "description": "Returns the authenticated user's pending trusted-contact invitations for in-app review."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trusted contact invitations fetched successfully.\",\n  \"data\": [\n    {\n      \"id\": \"trusted-contact-id\",\n      \"ownerId\": \"owner-user-id\",\n      \"owner\": {\n        \"id\": \"owner-user-id\",\n        \"name\": \"Demo User\",\n        \"email\": \"demo@example.com\",\n        \"profilePicture\": {\n          \"url\": \"https://example.com/profile.jpg\"\n        }\n      },\n      \"trustedContact\": {\n        \"name\": \"Trusted Contact\",\n        \"email\": \"trusted.contact@example.com\",\n        \"phone\": \"+15551234567\"\n      },\n      \"status\": \"pending\",\n      \"inactivityDays\": 90,\n      \"accessScope\": {\n        \"profile\": true,\n        \"documents\": true,\n        \"notes\": true,\n        \"messages\": false,\n        \"paymentInfo\": false,\n        \"accountTransfer\": false\n      },\n      \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n      \"updatedAt\": \"2026-06-10T00:00:00.000Z\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Accept Trusted Contact Invitation In App",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations/{{trustedContactId}}/accept",
+            "description": "Accepts a pending trusted-contact invitation for the authenticated user without requiring the email token flow."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations/{{trustedContactId}}/accept"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trusted contact invitation accepted.\",\n  \"data\": {\n    \"id\": \"trusted-contact-id\",\n    \"name\": \"Trusted Contact\",\n    \"email\": \"trusted.contact@example.com\",\n    \"status\": \"accepted\",\n    \"inactivityDays\": 90,\n    \"accessScope\": {\n      \"profile\": true,\n      \"documents\": true,\n      \"notes\": true,\n      \"messages\": false,\n      \"paymentInfo\": false,\n      \"accountTransfer\": false\n    },\n    \"acceptedAt\": \"2026-06-11T00:00:00.000Z\",\n    \"createdAt\": \"2026-06-10T00:00:00.000Z\",\n    \"updatedAt\": \"2026-06-11T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Decline Trusted Contact Invitation In App",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations/{{trustedContactId}}/decline",
+            "description": "Declines a pending trusted-contact invitation for the authenticated user without using the email token preview flow."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{apiV1BaseUrl}}/trusted-contacts/invitations/{{trustedContactId}}/decline"
+              },
+              "body": "{\n  \"success\": true,\n  \"message\": \"Trusted contact invitation declined.\"\n}"
+            }
+          ]
+        },
+        {
           "name": "Update Trusted Contact",
           "request": {
             "method": "PATCH",

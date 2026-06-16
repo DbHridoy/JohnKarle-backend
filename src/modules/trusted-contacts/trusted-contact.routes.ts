@@ -49,6 +49,17 @@ trustedContactRouter.post(
   trustedContactController.createTrustedContact,
 );
 trustedContactRouter.get("/", trustedContactController.listTrustedContacts);
+trustedContactRouter.get("/invitations", trustedContactController.listTrustedContactInvitations);
+trustedContactRouter.post(
+  "/invitations/:id/accept",
+  validateRequest({ params: trustedContactIdParamsSchema }),
+  trustedContactController.acceptTrustedContactInvitationById,
+);
+trustedContactRouter.post(
+  "/invitations/:id/decline",
+  validateRequest({ params: trustedContactIdParamsSchema }),
+  trustedContactController.declineTrustedContactInvitationById,
+);
 trustedContactRouter.patch(
   "/:id",
   validateRequest({

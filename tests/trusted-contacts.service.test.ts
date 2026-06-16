@@ -219,4 +219,214 @@ describe("trusted contact service", () => {
       expect.objectContaining({ action: "trusted_contact_invite_accepted" }),
     );
   });
+
+  it("lists pending invitations for the authenticated user email with owner details", async () => {
+    const ownerId = new Types.ObjectId();
+    const invitation = new TrustedContactModel({
+      _id: new Types.ObjectId(),
+      userId: ownerId,
+      name: "Trusted Person",
+      email: "trusted@example.com",
+      phone: "+15551234567",
+      status: "pending",
+      inactivityDays: 60,
+      accessScope: {
+        profile: true,
+        documents: false,
+        notes: true,
+        messages: false,
+        paymentInfo: false,
+        accountTransfer: false,
+      },
+      inviteTokenExpiresAt: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(TrustedContactModel, "find").mockReturnValue({
+      sort: vi.fn().mockReturnValue(mockExecResolved([invitation])),
+    } as never);
+    vi.spyOn(UserModel, "find").mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        lean: vi.fn().mockReturnValue(
+          mockExecResolved([
+            {
+              _id: ownerId,
+              name: "Owner",
+              email: "owner@example.com",
+              profilePicture: {
+                url: "https://example.com/profile.jpg",
+              },
+            },
+          ]),
+        ),
+      }),
+    } as never);
+
+    const result = await trustedContactService.listTrustedContactInvitations({
+      id: new Types.ObjectId().toString(),
+      email: "trusted@example.com",
+      role: "user",
+      tokenVersion: 0,
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      ownerId: ownerId.toString(),
+      owner: {
+        id: ownerId.toString(),
+        name: "Owner",
+        email: "owner@example.com",
+        profilePicture: {
+          url: "https://example.com/profile.jpg",
+        },
+      },
+      trustedContact: {
+        name: "Trusted Person",
+        email: "trusted@example.com",
+        phone: "+15551234567",
+      },
+      status: "pending",
+    });
+  });
+
+  it("allows an authenticated user to accept their pending invitation by id", async () => {
+    const trustedContact = new TrustedContactModel({
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(),
+      name: "Trusted Person",
+      email: "trusted@example.com",
+      status: "pending",
+      inactivityDays: 60,
+      accessScope: {
+        profile: true,
+        documents: false,
+        notes: true,
+        messages: false,
+        paymentInfo: false,
+        accountTransfer: false,
+      },
+      inviteTokenHash: hashToken("test-token"),
+      inviteTokenExpiresAt: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(TrustedContactModel, "findOne").mockReturnValue(
+      mockExecResolved(trustedContact) as never,
+    );
+    vi.spyOn(trustedContact, "save").mockResolvedValue(trustedContact);
+
+    const result = await trustedContactService.acceptTrustedContactInvitationById(
+      {
+        id: new Types.ObjectId().toString(),
+        email: "trusted@example.com",
+        role: "user",
+        tokenVersion: 0,
+      },
+      { id: trustedContact._id.toString() },
+      {},
+    );
+
+    expect(result.trustedContact.status).toBe("accepted");
+    expect(trustedContact.inviteTokenHash).toBeUndefined();
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "trusted_contact_invite_accepted",
+        actorType: "user",
+      }),
+    );
+  });
+
+  it("allows an authenticated user to accept by id even if the email token has expired", async () => {
+    const trustedContact = new TrustedContactModel({
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(),
+      name: "Trusted Person",
+      email: "trusted@example.com",
+      status: "pending",
+      inactivityDays: 60,
+      accessScope: {
+        profile: true,
+        documents: false,
+        notes: true,
+        messages: false,
+        paymentInfo: false,
+        accountTransfer: false,
+      },
+      inviteTokenHash: hashToken("expired-token"),
+      inviteTokenExpiresAt: new Date(Date.now() - 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(TrustedContactModel, "findOne").mockReturnValue(
+      mockExecResolved(trustedContact) as never,
+    );
+    vi.spyOn(trustedContact, "save").mockResolvedValue(trustedContact);
+
+    const result = await trustedContactService.acceptTrustedContactInvitationById(
+      {
+        id: new Types.ObjectId().toString(),
+        email: "trusted@example.com",
+        role: "user",
+        tokenVersion: 0,
+      },
+      { id: trustedContact._id.toString() },
+      {},
+    );
+
+    expect(result.trustedContact.status).toBe("accepted");
+  });
+
+  it("allows an authenticated user to decline their pending invitation by id", async () => {
+    const trustedContact = new TrustedContactModel({
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(),
+      name: "Trusted Person",
+      email: "trusted@example.com",
+      status: "pending",
+      inactivityDays: 60,
+      accessScope: {
+        profile: true,
+        documents: false,
+        notes: true,
+        messages: false,
+        paymentInfo: false,
+        accountTransfer: false,
+      },
+      inviteTokenHash: hashToken("test-token"),
+      inviteTokenExpiresAt: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(TrustedContactModel, "findOne").mockReturnValue(
+      mockExecResolved(trustedContact) as never,
+    );
+    vi.spyOn(trustedContact, "save").mockResolvedValue(trustedContact);
+
+    const result = await trustedContactService.declineTrustedContactInvitationById(
+      {
+        id: new Types.ObjectId().toString(),
+        email: "trusted@example.com",
+        role: "user",
+        tokenVersion: 0,
+      },
+      { id: trustedContact._id.toString() },
+      {},
+    );
+
+    expect(result).toMatchObject({
+      message: "Trusted contact invitation declined.",
+    });
+    expect(trustedContact.status).toBe("declined");
+    expect(trustedContact.inviteTokenHash).toBeUndefined();
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "trusted_contact_invite_declined",
+        actorType: "user",
+      }),
+    );
+  });
 });
