@@ -66,6 +66,27 @@ const findOwnedTrustedContactOrThrow = async (
   return trustedContact;
 };
 
+const findPendingTrustedContactInvitationForUserOrThrow = async (
+  authenticatedUser: AuthenticatedUser,
+  trustedContactId: string,
+): Promise<TrustedContactDocument> => {
+  const trustedContact = await TrustedContactModel.findOne({
+    _id: trustedContactId,
+    email: authenticatedUser.email,
+    status: "pending",
+  }).exec();
+
+  if (!trustedContact) {
+    throw new ApiError(
+      404,
+      "Trusted contact invitation not found.",
+      "TRUSTED_CONTACT_INVITATION_NOT_FOUND",
+    );
+  }
+
+  return trustedContact;
+};
+
 const findTrustedContactByInviteTokenOrThrow = async (
   token: string,
 ): Promise<TrustedContactDocument> => {
@@ -205,6 +226,54 @@ export const listTrustedContacts = async (user: AuthenticatedUser) => {
     .exec();
 
   return trustedContacts.map(toPublicTrustedContact);
+};
+
+export const listTrustedContactInvitations = async (user: AuthenticatedUser) => {
+  const invitations = await TrustedContactModel.find({
+    email: user.email,
+    status: "pending",
+  })
+    .sort({ createdAt: -1 })
+    .exec();
+
+  if (invitations.length === 0) {
+    return [];
+  }
+
+  const ownerIds = [...new Set(invitations.map((invitation) => invitation.userId.toString()))];
+  const owners = await UserModel.find({ _id: { $in: ownerIds } })
+    .select("name email profilePicture")
+    .lean()
+    .exec();
+  const ownerById = new Map(
+    owners.map((owner) => [
+      owner._id.toString(),
+      {
+        id: owner._id.toString(),
+        name: owner.name,
+        email: owner.email,
+        ...(owner.profilePicture ? { profilePicture: owner.profilePicture } : {}),
+      },
+    ]),
+  );
+
+  return invitations.map((invitation) => ({
+    id: invitation._id.toString(),
+    ownerId: invitation.userId.toString(),
+    ...(ownerById.get(invitation.userId.toString())
+      ? { owner: ownerById.get(invitation.userId.toString()) }
+      : {}),
+    trustedContact: {
+      name: invitation.name,
+      email: invitation.email,
+      ...(invitation.phone ? { phone: invitation.phone } : {}),
+    },
+    status: invitation.status,
+    inactivityDays: invitation.inactivityDays,
+    accessScope: invitation.accessScope,
+    createdAt: invitation.createdAt.toISOString(),
+    updatedAt: invitation.updatedAt.toISOString(),
+  }));
 };
 
 export const updateTrustedContact = async (
@@ -365,6 +434,44 @@ export const acceptTrustedContactInvitation = async (
   };
 };
 
+export const acceptTrustedContactInvitationById = async (
+  authenticatedUser: AuthenticatedUser,
+  params: TrustedContactIdParams,
+  audit: { ipAddress?: string; userAgent?: string },
+) => {
+  const trustedContact = await findPendingTrustedContactInvitationForUserOrThrow(
+    authenticatedUser,
+    params.id,
+  );
+
+  trustedContact.status = "accepted";
+  trustedContact.acceptedAt = new Date();
+  trustedContact.inviteTokenHash = undefined;
+  trustedContact.inviteTokenExpiresAt = undefined;
+  await trustedContact.save();
+
+  await createAuditLog({
+    userId: trustedContact.userId.toString(),
+    actorId: authenticatedUser.id,
+    actorType:
+      authenticatedUser.role === "admin" || authenticatedUser.role === "super_admin"
+        ? "admin"
+        : "user",
+    action: "trusted_contact_invite_accepted",
+    metadata: {
+      trustedContactId: trustedContact._id.toString(),
+      email: trustedContact.email,
+    },
+    ipAddress: audit.ipAddress,
+    userAgent: audit.userAgent,
+  });
+
+  return {
+    trustedContact: toPublicTrustedContact(trustedContact),
+    message: "Trusted contact invitation accepted.",
+  };
+};
+
 export const declineTrustedContactInvitation = async (
   token: string,
   audit: { ipAddress?: string; userAgent?: string },
@@ -379,6 +486,42 @@ export const declineTrustedContactInvitation = async (
   await createAuditLog({
     userId: trustedContact.userId.toString(),
     actorType: "trusted_contact",
+    action: "trusted_contact_invite_declined",
+    metadata: {
+      trustedContactId: trustedContact._id.toString(),
+      email: trustedContact.email,
+    },
+    ipAddress: audit.ipAddress,
+    userAgent: audit.userAgent,
+  });
+
+  return {
+    message: "Trusted contact invitation declined.",
+  };
+};
+
+export const declineTrustedContactInvitationById = async (
+  authenticatedUser: AuthenticatedUser,
+  params: TrustedContactIdParams,
+  audit: { ipAddress?: string; userAgent?: string },
+) => {
+  const trustedContact = await findPendingTrustedContactInvitationForUserOrThrow(
+    authenticatedUser,
+    params.id,
+  );
+
+  trustedContact.status = "declined";
+  trustedContact.inviteTokenHash = undefined;
+  trustedContact.inviteTokenExpiresAt = undefined;
+  await trustedContact.save();
+
+  await createAuditLog({
+    userId: trustedContact.userId.toString(),
+    actorId: authenticatedUser.id,
+    actorType:
+      authenticatedUser.role === "admin" || authenticatedUser.role === "super_admin"
+        ? "admin"
+        : "user",
     action: "trusted_contact_invite_declined",
     metadata: {
       trustedContactId: trustedContact._id.toString(),
