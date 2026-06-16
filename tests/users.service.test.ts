@@ -7,6 +7,7 @@ process.env.LOG_LEVEL = "silent";
 
 const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
 const createNotificationMock = vi.fn().mockResolvedValue(null);
+const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../src/utils/mail.util.js", () => ({
   sendTransactionalEmail: sendTransactionalEmailMock,
@@ -14,6 +15,10 @@ vi.mock("../src/utils/mail.util.js", () => ({
 
 vi.mock("../src/modules/notifications/notification.service.js", () => ({
   createNotification: createNotificationMock,
+}));
+
+vi.mock("../src/modules/audit-logs/audit-log.service.js", () => ({
+  createAuditLog: createAuditLogMock,
 }));
 
 const userService = await import("../src/modules/users/user.service.js");
@@ -35,9 +40,10 @@ describe("user family invitations and memberships", () => {
     vi.restoreAllMocks();
     sendTransactionalEmailMock.mockClear();
     createNotificationMock.mockClear();
+    createAuditLogMock.mockClear();
   });
 
-  it("creates a pending family-member invitation for an existing user", async () => {
+  it("creates a pending in-app family-member invitation for an existing user without sending email", async () => {
     const inviterId = new Types.ObjectId();
     const existingUserId = new Types.ObjectId();
     const inviter = new UserModel({
@@ -124,7 +130,112 @@ describe("user family invitations and memberships", () => {
       },
     ]);
     expect(createInvitationSpy).toHaveBeenCalledTimes(1);
+    expect(sendTransactionalEmailMock).not.toHaveBeenCalled();
+    expect(createNotificationMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipient: existingUserId,
+        actor: inviterId,
+        type: "family_invitation_received",
+      }),
+    );
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: inviterId.toString(),
+        action: "family_invitation_created",
+        targetType: "family_invitation",
+        targetLabel: existingUser.email,
+      }),
+    );
+  });
+
+  it("emails invitation details when the invited family member does not already have an account", async () => {
+    const inviterId = new Types.ObjectId();
+    const createdUserId = new Types.ObjectId();
+    const inviter = new UserModel({
+      _id: inviterId,
+      name: "Inviter",
+      email: "inviter@example.com",
+      passwordHash: "hash",
+      role: "user",
+      isEmailVerified: true,
+      familyMembers: [],
+      preferences: {
+        notifications: true,
+        aiInsight: true,
+        darkMode: false,
+        anonymousAnalytics: true,
+      },
+      refreshTokenVersion: 0,
+      legacyAccessEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    const createdUser = new UserModel({
+      _id: createdUserId,
+      name: "New Invitee",
+      email: "new.invitee@example.com",
+      passwordHash: "hash",
+      role: "user",
+      isEmailVerified: false,
+      familyMembers: [],
+      preferences: {
+        notifications: true,
+        aiInsight: true,
+        darkMode: false,
+        anonymousAnalytics: true,
+      },
+      refreshTokenVersion: 0,
+      legacyAccessEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(UserModel, "findById").mockReturnValue(mockExecResolved(inviter) as never);
+    vi.spyOn(UserModel, "findOne").mockReturnValue(mockExecResolved(null) as never);
+    vi.spyOn(UserFamilyMembershipModel, "exists").mockReturnValue(mockExecResolved(null) as never);
+    vi.spyOn(UserFamilyInvitationModel, "exists").mockReturnValue(mockExecResolved(null) as never);
+    vi.spyOn(UserFamilyInvitationModel, "create").mockImplementation(async (payload) => {
+      return new UserFamilyInvitationModel({
+        _id: new Types.ObjectId(),
+        ...payload,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    });
+    vi.spyOn(UserModel, "create").mockResolvedValue(createdUser);
+    vi.spyOn(inviter, "save").mockResolvedValue(inviter);
+
+    await userService.createInvitation(
+      {
+        id: inviterId.toString(),
+        email: inviter.email,
+        role: "user",
+        tokenVersion: 0,
+      },
+      {
+        name: "New Invitee",
+        email: createdUser.email,
+        relation: "brother",
+        role: "viewer",
+      },
+    );
+
     expect(sendTransactionalEmailMock).toHaveBeenCalledTimes(1);
+    expect(createNotificationMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipient: createdUserId,
+        actor: inviterId,
+        type: "family_invitation_received",
+      }),
+    );
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: inviterId.toString(),
+        action: "family_invitation_created",
+        targetType: "family_invitation",
+        targetLabel: createdUser.email,
+      }),
+    );
   });
 
   it("creates a normalized membership record when an invitation is accepted", async () => {
@@ -230,6 +341,14 @@ describe("user family invitations and memberships", () => {
     );
     expect(inviter.familyMembers[0]?.status).toBe("accepted");
     expect(existingUser.familyMembers[0]?.userId).toBe(inviterId.toString());
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: existingUserId.toString(),
+        action: "family_invitation_accepted",
+        targetType: "family_invitation",
+        targetLabel: existingUser.email,
+      }),
+    );
   });
 
   it("lists family members from the normalized membership source of truth", async () => {
@@ -253,6 +372,13 @@ describe("user family invitations and memberships", () => {
       _id: counterpartId,
       name: "Accepted Member",
       email: "accepted@example.com",
+      profilePicture: {
+        key: "users/accepted/profile/avatar.png",
+        url: "https://example.com/accepted-avatar.png",
+        originalName: "avatar.png",
+        mimeType: "image/png",
+        size: 1200,
+      },
       passwordHash: "hash",
       role: "user",
       isEmailVerified: true,
@@ -286,10 +412,191 @@ describe("user family invitations and memberships", () => {
         userId: counterpartId.toString(),
         name: "Accepted Member",
         email: "accepted@example.com",
+        profilePicture: counterpartUser.profilePicture,
         relation: "brother",
         role: "viewer",
         status: "accepted",
       },
+    ]);
+  });
+
+  it("hydrates family member profile pictures on the current user profile", async () => {
+    const userId = new Types.ObjectId();
+    const familyMemberUserId = new Types.ObjectId();
+    const familyProfilePicture = {
+      key: "users/family/profile/avatar.png",
+      url: "https://example.com/family-avatar.png",
+      originalName: "avatar.png",
+      mimeType: "image/png",
+      size: 2400,
+    };
+    const user = new UserModel({
+      _id: userId,
+      name: "Current User",
+      email: "current@example.com",
+      passwordHash: "hash",
+      role: "user",
+      isEmailVerified: true,
+      familyMembers: [
+        {
+          userId: familyMemberUserId.toString(),
+          name: "Family Member",
+          email: "family@example.com",
+          relation: "brother",
+          role: "viewer",
+          status: "pending",
+        },
+      ],
+      preferences: {
+        notifications: true,
+        aiInsight: true,
+        darkMode: false,
+        anonymousAnalytics: true,
+      },
+      refreshTokenVersion: 0,
+      legacyAccessEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    vi.spyOn(UserModel, "findById").mockReturnValue(mockExecResolved(user) as never);
+    vi.spyOn(UserModel, "find").mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        lean: vi.fn().mockReturnValue(
+          mockExecResolved([
+            {
+              _id: familyMemberUserId,
+              email: "family@example.com",
+              profilePicture: familyProfilePicture,
+            },
+          ]),
+        ),
+      }),
+    } as never);
+
+    const profile = await userService.getProfile({
+      id: userId.toString(),
+      email: user.email,
+      role: "user",
+      tokenVersion: 0,
+    });
+
+    expect(profile.familyMembers).toEqual([
+      expect.objectContaining({
+        userId: familyMemberUserId.toString(),
+        email: "family@example.com",
+        profilePicture: familyProfilePicture,
+      }),
+    ]);
+  });
+
+  it("lists pending invitations sent by or addressed to the authenticated user", async () => {
+    const userId = new Types.ObjectId();
+    const senderProfilePicture = {
+      key: "users/sender/profile/avatar.png",
+      url: "https://example.com/avatar.png",
+      originalName: "avatar.png",
+      mimeType: "image/png",
+      size: 1234,
+    };
+    const sentInvitation = new UserFamilyInvitationModel({
+      _id: new Types.ObjectId(),
+      inviterId: userId,
+      inviteeUserId: new Types.ObjectId(),
+      inviteeName: "Invited User",
+      inviteeEmail: "invited@example.com",
+      relation: "brother",
+      role: "editor",
+      tokenHash: hashToken("sent-token"),
+      expiresAt: new Date(Date.now() + 60_000),
+      status: "pending",
+      createdAt: new Date("2026-06-16T00:00:00.000Z"),
+      updatedAt: new Date("2026-06-16T00:00:00.000Z"),
+    });
+    const receivedInvitation = new UserFamilyInvitationModel({
+      _id: new Types.ObjectId(),
+      inviterId: new Types.ObjectId(),
+      inviteeUserId: userId,
+      inviteeName: "Current User",
+      inviteeEmail: "current@example.com",
+      relation: "sister",
+      role: "viewer",
+      tokenHash: hashToken("received-token"),
+      expiresAt: new Date(Date.now() + 60_000),
+      status: "pending",
+      createdAt: new Date("2026-06-15T00:00:00.000Z"),
+      updatedAt: new Date("2026-06-15T00:00:00.000Z"),
+    });
+
+    const inviters = [
+      {
+        _id: userId,
+        name: "Current User",
+        email: "current@example.com",
+      },
+      {
+        _id: receivedInvitation.inviterId,
+        name: "Sender User",
+        email: "sender@example.com",
+        profilePicture: senderProfilePicture,
+      },
+    ];
+
+    const selectMock = vi.fn().mockReturnValue({
+      sort: vi.fn().mockReturnValue(mockExecResolved([sentInvitation, receivedInvitation])),
+    });
+    const findSpy = vi.spyOn(UserFamilyInvitationModel, "find").mockReturnValue({
+      select: selectMock,
+    } as never);
+    const userFindSpy = vi.spyOn(UserModel, "find").mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        lean: vi.fn().mockReturnValue(mockExecResolved(inviters)),
+      }),
+    } as never);
+
+    const invitations = await userService.listInvitations({
+      id: userId.toString(),
+      email: "current@example.com",
+      role: "user",
+      tokenVersion: 0,
+    });
+
+    expect(findSpy).toHaveBeenCalledWith({
+      $or: [
+        { inviterId: userId.toString() },
+        { inviteeUserId: userId.toString() },
+        { inviteeEmail: "current@example.com" },
+      ],
+      status: "pending",
+    });
+    expect(selectMock).toHaveBeenCalledWith("+expiresAt");
+    expect(userFindSpy).toHaveBeenCalledWith({
+      _id: { $in: [userId.toString(), receivedInvitation.inviterId.toString()] },
+    });
+    expect(invitations).toEqual([
+      expect.objectContaining({
+        id: sentInvitation._id.toString(),
+        inviterId: userId.toString(),
+        inviter: {
+          id: userId.toString(),
+          name: "Current User",
+          email: "current@example.com",
+        },
+        direction: "sent",
+        inviteeEmail: "invited@example.com",
+      }),
+      expect.objectContaining({
+        id: receivedInvitation._id.toString(),
+        inviterId: receivedInvitation.inviterId.toString(),
+        inviter: {
+          id: receivedInvitation.inviterId.toString(),
+          name: "Sender User",
+          email: "sender@example.com",
+          profilePicture: senderProfilePicture,
+        },
+        direction: "received",
+        inviteeEmail: "current@example.com",
+      }),
     ]);
   });
 
@@ -499,6 +806,14 @@ describe("user family invitations and memberships", () => {
     expect(invitation.status).toBe("declined");
     expect(membershipCreateSpy).not.toHaveBeenCalled();
     expect(inviter.familyMembers).toEqual([]);
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: inviteeUserId.toString(),
+        action: "family_invitation_declined",
+        targetType: "family_invitation",
+        targetLabel: "invitee@example.com",
+      }),
+    );
   });
 
   it("rejects self-invites", async () => {

@@ -5,6 +5,7 @@ import { randomInt, randomUUID } from "node:crypto";
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { sendTransactionalEmail } from "../../utils/mail.util.js";
+import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { recordUserActivity } from "../legacy-access/legacy-access.activity.js";
 import { toPublicUser } from "../users/user.presenter.js";
 import { UserModel, type UserDocument } from "../users/user.model.js";
@@ -94,25 +95,29 @@ export const register = async (input: RegisterInput): Promise<AuthResponse> => {
     passwordHash,
   });
 
+  await createAuditLog({
+    userId: user._id.toString(),
+    actorId: user._id.toString(),
+    actorType: "user",
+    action: "user_registered",
+    metadata: {
+      email: user.email,
+      role: user.role,
+    },
+    targetType: "user",
+    targetId: user._id.toString(),
+    targetLabel: user.email,
+  });
+
   return buildAuthResponse(user);
 };
 
 export const login = async (input: LoginInput): Promise<AuthResponse> => {
   const email = input.email.trim().toLowerCase();
-  const user = await UserModel.findOne({ email })
-    .select("+passwordHash +invitationTokenHash +invitationExpiresAt")
-    .exec();
+  const user = await UserModel.findOne({ email }).select("+passwordHash").exec();
 
   if (!user) {
     throw invalidCredentialsError;
-  }
-
-  if (user.invitationTokenHash) {
-    if (user.invitationExpiresAt && user.invitationExpiresAt.getTime() < Date.now()) {
-      throw new ApiError(400, "Invitation has expired.", "INVITATION_EXPIRED");
-    }
-
-    throw new ApiError(403, "Invitation must be accepted before login.", "INVITATION_PENDING");
   }
 
   const passwordMatches = await bcrypt.compare(input.password, user.passwordHash);

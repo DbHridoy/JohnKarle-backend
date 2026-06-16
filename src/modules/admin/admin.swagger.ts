@@ -25,6 +25,120 @@
 
 /**
  * @swagger
+ * /api/v1/admin/dashboard/recent-activities:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get recent dashboard activities
+ *     description: Returns a paginated, newest-first feed of recent system activities derived from audit logs.
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: actorId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: targetType
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: targetId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Recent activities retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Recent activities fetched successfully.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                       message:
+ *                         type: string
+ *                       actor:
+ *                         type: object
+ *                       target:
+ *                         type: object
+ *                       metadata:
+ *                         type: object
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 20
+ *                     total:
+ *                       type: integer
+ *                       example: 42
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
+ *                     hasNextPage:
+ *                       type: boolean
+ *                       example: true
+ *                     hasPrevPage:
+ *                       type: boolean
+ *                       example: false
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Admin access required
+ */
+
+/**
+ * @swagger
  * /api/v1/admin/users:
  *   get:
  *     tags: [Admin]
@@ -183,6 +297,118 @@
  *     responses:
  *       200:
  *         description: Email send completed
+ */
+
+/**
+ * @swagger
+ * /api/v1/admin/email-templates:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Create an email template
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [templateName, subjectLine, content]
+ *             properties:
+ *               templateName:
+ *                 type: string
+ *               subjectLine:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Email template created successfully
+ *   get:
+ *     tags: [Admin]
+ *     summary: List email templates
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Email templates fetched successfully
+ *
+ * /api/v1/admin/email-templates/{templateId}:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Get an email template by id
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: templateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Email template fetched successfully
+ *       404:
+ *         description: Email template not found
+ *   patch:
+ *     tags: [Admin]
+ *     summary: Update an email template
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: templateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               templateName:
+ *                 type: string
+ *               subjectLine:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email template updated successfully
+ *   delete:
+ *     tags: [Admin]
+ *     summary: Delete an email template
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: templateId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Email template deleted successfully
  */
 
 /**

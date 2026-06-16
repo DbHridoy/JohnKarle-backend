@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
+import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { areAcceptedFamilyMembers } from "../users/user-family-membership.service.js";
 import { MemoryVaultModel, type MemoryVaultDocument } from "./memory-vault.model.js";
@@ -193,6 +194,21 @@ export const createMemory = async (
       tags: input.tags,
     });
 
+    await createAuditLog({
+      userId: user.id,
+      actorId: user.id,
+      actorType: "user",
+      action: "memory_created",
+      metadata: {
+        memoryType: memory.type,
+        title: memory.title,
+        fileCount: memory.files.length,
+      },
+      targetType: "memory",
+      targetId: memory._id.toString(),
+      targetLabel: memory.title,
+    });
+
     return toPublicMemoryVaultItem(memory);
   } catch (error) {
     await deleteFilesFromS3(uploadedFiles).catch(() => undefined);
@@ -284,6 +300,21 @@ export const updateMemory = async (
 
     await memory.save();
 
+    await createAuditLog({
+      userId: user.id,
+      actorId: user.id,
+      actorType: "user",
+      action: "memory_updated",
+      metadata: {
+        memoryType: memory.type,
+        title: memory.title,
+        fileCount: memory.files.length,
+      },
+      targetType: "memory",
+      targetId: memory._id.toString(),
+      targetLabel: memory.title,
+    });
+
     if (files.length > 0) {
       await deleteFilesFromS3(previousFiles).catch(() => undefined);
     }
@@ -300,4 +331,18 @@ export const deleteMemory = async (user: AuthenticatedUser, params: MemoryVaultP
 
   await MemoryVaultModel.deleteOne({ _id: memory._id }).exec();
   await deleteFilesFromS3(memory.files).catch(() => undefined);
+  await createAuditLog({
+    userId: user.id,
+    actorId: user.id,
+    actorType: "user",
+    action: "memory_deleted",
+    metadata: {
+      memoryType: memory.type,
+      title: memory.title,
+      fileCount: memory.files.length,
+    },
+    targetType: "memory",
+    targetId: memory._id.toString(),
+    targetLabel: memory.title,
+  });
 };

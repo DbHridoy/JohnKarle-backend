@@ -28,8 +28,28 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     user:
- *                       $ref: "#/components/schemas/PublicUser"
+ *                     id:
+ *                       type: string
+ *                     familyMembers:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           userId:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                             format: email
+ *                           profilePicture:
+ *                             type: object
+ *                             properties:
+ *                               key:
+ *                                 type: string
+ *                               url:
+ *                                 type: string
+ *                                 format: uri
  *       401:
  *         description: Authentication required
  *         content:
@@ -127,6 +147,35 @@
  *     responses:
  *       200:
  *         description: Accepted family members retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       userId:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                         format: email
+ *                       profilePicture:
+ *                         type: object
+ *                         properties:
+ *                           key:
+ *                             type: string
+ *                           url:
+ *                             type: string
+ *                             format: uri
  *       401:
  *         description: Authentication required
  */
@@ -136,13 +185,54 @@
  * /api/v1/users/invitations:
  *   get:
  *     tags: [Users]
- *     summary: List pending invitations for the authenticated invitee
- *     description: Returns pending family-member invitations addressed to the authenticated user by user id or email.
+ *     summary: List pending invitations relevant to the authenticated user
+ *     description: Returns pending family-member invitations either sent by the authenticated user or addressed to the authenticated user by user id or email.
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Invitations retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Invitations fetched successfully.
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       inviterId:
+ *                         type: string
+ *                       inviter:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                             format: email
+ *                           profilePicture:
+ *                             type: object
+ *                             properties:
+ *                               key:
+ *                                 type: string
+ *                               url:
+ *                                 type: string
+ *                                 format: uri
+ *                       direction:
+ *                         type: string
+ *                         enum: [sent, received]
  *       401:
  *         description: Authentication required
  */
@@ -153,7 +243,7 @@
  *   post:
  *     tags: [Users]
  *     summary: Create a family invitation
- *     description: Invites a family member by email. If the email belongs to an existing user, the family-member relationship remains pending until that user accepts. If the email does not belong to an existing user, a new user account is created with a temporary password and the relationship remains pending until acceptance.
+ *     description: Invites a family member by email. If the email belongs to an existing user, the invitation is delivered in-app and remains pending until that user accepts. If the email does not belong to an existing user, a new user account is created, a temporary-password invitation email is sent, and the relationship remains pending until acceptance.
  *     security:
  *       - BearerAuth: []
  *     requestBody:

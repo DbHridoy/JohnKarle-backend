@@ -5,6 +5,7 @@ import { env } from "../../config/env.config.js";
 import { ApiError } from "../../utils/api-error.util.js";
 import { sendTransactionalEmail } from "../../utils/mail.util.js";
 import { generateSecureToken, hashToken, verifyTokenHash } from "../../utils/token.util.js";
+import { createAuditLog } from "../audit-logs/audit-log.service.js";
 import { createNotification } from "../notifications/notification.service.js";
 import type { AuthenticatedUser } from "../auth/auth.types.js";
 import { toPublicUser } from "./user.presenter.js";
@@ -82,6 +83,46 @@ const findUserOrThrow = async (userId: string) => {
   }
 
   return user;
+};
+
+const hydrateFamilyMembers = async (familyMembers: FamilyMember[]): Promise<FamilyMember[]> => {
+  if (familyMembers.length === 0) {
+    return familyMembers;
+  }
+
+  const userIds = [...new Set(familyMembers.map((member) => member.userId).filter(Boolean))];
+  const emails = [...new Set(familyMembers.map((member) => member.email.trim().toLowerCase()))];
+  const users =
+    userIds.length > 0 || emails.length > 0
+      ? await UserModel.find({
+          $or: [
+            ...(userIds.length > 0 ? [{ _id: { $in: userIds } }] : []),
+            ...(emails.length > 0 ? [{ email: { $in: emails } }] : []),
+          ],
+        })
+          .select("email profilePicture")
+          .lean()
+          .exec()
+      : [];
+
+  const usersById = new Map(users.map((user) => [user._id.toString(), user]));
+  const usersByEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
+
+  return familyMembers.map((member) => {
+    const memberWithToObject = member as unknown as { toObject?: () => FamilyMember };
+    const plainMember =
+      typeof memberWithToObject.toObject === "function"
+        ? memberWithToObject.toObject()
+        : { ...member };
+    const matchedUser =
+      (plainMember.userId ? usersById.get(plainMember.userId) : undefined) ??
+      usersByEmail.get(plainMember.email.toLowerCase());
+
+    return {
+      ...plainMember,
+      ...(matchedUser?.profilePicture ? { profilePicture: matchedUser.profilePicture } : {}),
+    };
+  });
 };
 
 const sendInvitationEmail = async (
@@ -166,8 +207,12 @@ const removePendingFamilyMemberEntry = (
 
 export const getProfile = async (authenticatedUser: AuthenticatedUser) => {
   const user = await findUserOrThrow(authenticatedUser.id);
+  const profile = toPublicUser(user);
 
-  return toPublicUser(user);
+  return {
+    ...profile,
+    familyMembers: await hydrateFamilyMembers(profile.familyMembers),
+  };
 };
 
 export const updateProfile = async (
@@ -308,13 +353,15 @@ export const createInvitation = async (
   await inviter.save();
 
   try {
-    await sendInvitationEmail(
-      inviter.name,
-      invitedUser?.name ?? input.name,
-      input.email,
-      invitationToken,
-      generatedPassword,
-    );
+    if (!existingUser) {
+      await sendInvitationEmail(
+        inviter.name,
+        invitedUser?.name ?? input.name,
+        input.email,
+        invitationToken,
+        generatedPassword,
+      );
+    }
   } catch (error) {
     await UserFamilyInvitationModel.deleteOne({ _id: invitation._id }).exec();
 
@@ -347,6 +394,23 @@ export const createInvitation = async (
       role: invitation.role,
     },
   }).catch(() => undefined);
+
+  await createAuditLog({
+    userId: inviter._id.toString(),
+    actorId: inviter._id.toString(),
+    actorType: "user",
+    action: "family_invitation_created",
+    metadata: {
+      inviteeEmail: invitation.inviteeEmail,
+      inviteeName: invitation.inviteeName,
+      relation: invitation.relation,
+      role: invitation.role,
+      isExistingUser: Boolean(existingUser),
+    },
+    targetType: "family_invitation",
+    targetId: invitation._id.toString(),
+    targetLabel: invitation.inviteeEmail,
+  });
 
   return {
     invitation: {
@@ -413,6 +477,22 @@ export const acceptInvitation = async (input: AcceptInvitationInput) => {
     },
   }).catch(() => undefined);
 
+  await createAuditLog({
+    userId: inviter._id.toString(),
+    actorId: invitedUser._id.toString(),
+    actorType: "user",
+    action: "family_invitation_accepted",
+    metadata: {
+      inviteeEmail: invitedUser.email,
+      inviteeName: invitedUser.name,
+      relation: invitation.relation,
+      role: invitation.role,
+    },
+    targetType: "family_invitation",
+    targetId: invitation._id.toString(),
+    targetLabel: invitedUser.email,
+  });
+
   return {
     email: invitedUser.email,
     message: "Invitation accepted successfully.",
@@ -421,15 +501,47 @@ export const acceptInvitation = async (input: AcceptInvitationInput) => {
 
 export const listInvitations = async (authenticatedUser: AuthenticatedUser) => {
   const invitations = await UserFamilyInvitationModel.find({
-    $or: [{ inviteeUserId: authenticatedUser.id }, { inviteeEmail: authenticatedUser.email }],
+    $or: [
+      { inviterId: authenticatedUser.id },
+      { inviteeUserId: authenticatedUser.id },
+      { inviteeEmail: authenticatedUser.email },
+    ],
     status: "pending",
   })
+    .select("+expiresAt")
     .sort({ createdAt: -1 })
     .exec();
+
+  const inviterIds = [...new Set(invitations.map((invitation) => invitation.inviterId.toString()))];
+  const inviters =
+    inviterIds.length > 0
+      ? await UserModel.find({ _id: { $in: inviterIds } })
+          .select("name email profilePicture")
+          .lean()
+          .exec()
+      : [];
+  const inviterById = new Map(
+    inviters.map((inviter) => [
+      inviter._id.toString(),
+      {
+        id: inviter._id.toString(),
+        name: inviter.name,
+        email: inviter.email,
+        ...(inviter.profilePicture ? { profilePicture: inviter.profilePicture } : {}),
+      },
+    ]),
+  );
 
   return invitations.map((invitation) => ({
     id: invitation._id.toString(),
     inviterId: invitation.inviterId.toString(),
+    ...(inviterById.get(invitation.inviterId.toString())
+      ? { inviter: inviterById.get(invitation.inviterId.toString()) }
+      : {}),
+    direction:
+      invitation.inviterId.toString() === authenticatedUser.id
+        ? ("sent" as const)
+        : ("received" as const),
     ...(invitation.inviteeUserId ? { inviteeUserId: invitation.inviteeUserId.toString() } : {}),
     inviteeEmail: invitation.inviteeEmail,
     inviteeName: invitation.inviteeName,
@@ -518,6 +630,22 @@ export const declineInvitationById = async (
     removePendingFamilyMemberEntry(inviter, invitation.inviteeEmail);
     await inviter.save();
   }
+
+  await createAuditLog({
+    userId: invitation.inviterId.toString(),
+    actorId: authenticatedUser.id,
+    actorType: "user",
+    action: "family_invitation_declined",
+    metadata: {
+      inviteeEmail: invitation.inviteeEmail,
+      inviteeName: invitation.inviteeName,
+      relation: invitation.relation,
+      role: invitation.role,
+    },
+    targetType: "family_invitation",
+    targetId: invitation._id.toString(),
+    targetLabel: invitation.inviteeEmail,
+  });
 
   return {
     message: "Invitation declined successfully.",
