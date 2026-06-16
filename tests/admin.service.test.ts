@@ -10,6 +10,7 @@ const sendTransactionalEmailMock = vi.fn().mockResolvedValue(undefined);
 const reauthMock = vi.fn().mockResolvedValue(undefined);
 const uploadProfilePictureMock = vi.fn();
 const deleteProfilePictureMock = vi.fn().mockResolvedValue(undefined);
+const createAuditLogMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("../src/utils/mail.util.js", () => ({
   sendTransactionalEmail: sendTransactionalEmailMock,
@@ -17,6 +18,10 @@ vi.mock("../src/utils/mail.util.js", () => ({
 
 vi.mock("../src/modules/auth/auth.reauth.js", () => ({
   requireRecentPasswordReauth: reauthMock,
+}));
+
+vi.mock("../src/modules/audit-logs/audit-log.service.js", () => ({
+  createAuditLog: createAuditLogMock,
 }));
 
 vi.mock("../src/modules/users/user.upload.js", () => ({
@@ -29,6 +34,9 @@ const adminService = await import("../src/modules/admin/admin.service.js");
 const { UserModel } = await import("../src/modules/users/user.model.js");
 const { AdminSettingsModel, adminSettingsKey } =
   await import("../src/modules/admin/admin-settings.model.js");
+const { AuditLogModel } = await import("../src/modules/audit-logs/audit-log.model.js");
+const { EmailTemplateModel } =
+  await import("../src/modules/email-templates/email-template.model.js");
 
 const mockExecResolved = <T>(value: T) => ({
   exec: vi.fn().mockResolvedValue(value),
@@ -41,6 +49,7 @@ describe("admin service", () => {
     reauthMock.mockClear();
     uploadProfilePictureMock.mockReset();
     deleteProfilePictureMock.mockClear();
+    createAuditLogMock.mockClear();
   });
 
   it("returns dashboard metrics using efficient count queries", async () => {
@@ -58,6 +67,177 @@ describe("admin service", () => {
     expect(countDocumentsSpy).toHaveBeenNthCalledWith(1, {});
     expect(countDocumentsSpy).toHaveBeenNthCalledWith(2, {
       lastActiveAt: { $exists: true, $ne: null },
+    });
+  });
+
+  it("lists recent activities with filters, pagination, and sanitized metadata", async () => {
+    const actorId = new Types.ObjectId();
+    const auditLogId = new Types.ObjectId();
+    const createdAt = new Date("2026-06-16T10:00:00.000Z");
+    const searchUserId = new Types.ObjectId();
+
+    vi.spyOn(UserModel, "find")
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnValue({
+          lean: vi.fn().mockReturnValue(mockExecResolved([{ _id: searchUserId }])),
+        }),
+      } as never)
+      .mockReturnValueOnce({
+        select: vi.fn().mockReturnValue({
+          lean: vi.fn().mockReturnValue(
+            mockExecResolved([
+              {
+                _id: actorId,
+                name: "Admin Actor",
+                email: "admin@example.com",
+                role: "admin",
+              },
+            ]),
+          ),
+        }),
+      } as never);
+
+    const countDocumentsSpy = vi
+      .spyOn(AuditLogModel, "countDocuments")
+      .mockReturnValue(mockExecResolved(1) as never);
+    const findSpy = vi.spyOn(AuditLogModel, "find").mockReturnValue({
+      sort: vi.fn().mockReturnValue({
+        skip: vi.fn().mockReturnValue({
+          limit: vi.fn().mockReturnValue({
+            lean: vi.fn().mockReturnValue(
+              mockExecResolved([
+                {
+                  _id: auditLogId,
+                  actorId,
+                  action: "trusted_contact_added",
+                  targetType: "trusted_contact",
+                  targetId: "507f1f77bcf86cd799439099",
+                  targetLabel: "John Trusted",
+                  metadata: {
+                    phone: "+123",
+                    password: "secret",
+                    nested: {
+                      refreshToken: "token",
+                    },
+                  },
+                  createdAt,
+                },
+              ]),
+            ),
+          }),
+        }),
+      }),
+    } as never);
+
+    const result = await adminService.listRecentActivities({
+      page: 2,
+      limit: 10,
+      type: "trusted_contact_added",
+      actorId: actorId.toString(),
+      targetType: "trusted_contact",
+      targetId: "507f1f77bcf86cd799439099",
+      from: new Date("2026-01-01T00:00:00.000Z"),
+      to: new Date("2026-12-31T23:59:59.999Z"),
+      search: "admin",
+    });
+
+    expect(countDocumentsSpy).toHaveBeenCalledWith({
+      action: "trusted_contact_added",
+      actorId: actorId.toString(),
+      targetType: "trusted_contact",
+      targetId: "507f1f77bcf86cd799439099",
+      createdAt: {
+        $gte: new Date("2026-01-01T00:00:00.000Z"),
+        $lte: new Date("2026-12-31T23:59:59.999Z"),
+      },
+      $or: [
+        { action: { $regex: "admin", $options: "i" } },
+        { targetType: { $regex: "admin", $options: "i" } },
+        { targetLabel: { $regex: "admin", $options: "i" } },
+        { actorId: { $in: [searchUserId] } },
+      ],
+    });
+    expect(findSpy).toHaveBeenCalledWith({
+      action: "trusted_contact_added",
+      actorId: actorId.toString(),
+      targetType: "trusted_contact",
+      targetId: "507f1f77bcf86cd799439099",
+      createdAt: {
+        $gte: new Date("2026-01-01T00:00:00.000Z"),
+        $lte: new Date("2026-12-31T23:59:59.999Z"),
+      },
+      $or: [
+        { action: { $regex: "admin", $options: "i" } },
+        { targetType: { $regex: "admin", $options: "i" } },
+        { targetLabel: { $regex: "admin", $options: "i" } },
+        { actorId: { $in: [searchUserId] } },
+      ],
+    });
+    expect(result).toEqual({
+      activities: [
+        {
+          id: auditLogId.toString(),
+          type: "trusted_contact_added",
+          message: "Trusted contact added",
+          actor: {
+            id: actorId.toString(),
+            name: "Admin Actor",
+            email: "admin@example.com",
+            role: "admin",
+          },
+          target: {
+            type: "trusted_contact",
+            id: "507f1f77bcf86cd799439099",
+            label: "John Trusted",
+          },
+          metadata: {
+            phone: "+123",
+            password: "[Redacted]",
+            nested: {
+              refreshToken: "[Redacted]",
+            },
+          },
+          createdAt: createdAt.toISOString(),
+        },
+      ],
+      pagination: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: true,
+      },
+    });
+  });
+
+  it("returns an empty recent activity feed with valid pagination", async () => {
+    vi.spyOn(AuditLogModel, "countDocuments").mockReturnValue(mockExecResolved(0) as never);
+    vi.spyOn(AuditLogModel, "find").mockReturnValue({
+      sort: vi.fn().mockReturnValue({
+        skip: vi.fn().mockReturnValue({
+          limit: vi.fn().mockReturnValue({
+            lean: vi.fn().mockReturnValue(mockExecResolved([])),
+          }),
+        }),
+      }),
+    } as never);
+
+    const result = await adminService.listRecentActivities({
+      page: 1,
+      limit: 20,
+    });
+
+    expect(result).toEqual({
+      activities: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
     });
   });
 
@@ -132,6 +312,108 @@ describe("admin service", () => {
       name: "John Doe",
     });
     expect(result.users[0]).not.toHaveProperty("passwordHash");
+  });
+
+  it("creates, lists, gets, updates, and deletes email templates", async () => {
+    const adminId = new Types.ObjectId();
+    const templateId = new Types.ObjectId();
+    const template = new EmailTemplateModel({
+      _id: templateId,
+      templateName: "Welcome Template",
+      subjectLine: "Welcome",
+      content: "Hello {{name}}",
+      createdBy: adminId,
+      updatedBy: adminId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const existsSpy = vi
+      .spyOn(EmailTemplateModel, "exists")
+      .mockReturnValueOnce(mockExecResolved(null) as never)
+      .mockReturnValueOnce(mockExecResolved(null) as never)
+      .mockReturnValueOnce(mockExecResolved({ _id: new Types.ObjectId() }) as never);
+    vi.spyOn(EmailTemplateModel, "create").mockResolvedValue(template);
+    vi.spyOn(EmailTemplateModel, "countDocuments").mockReturnValue(mockExecResolved(1) as never);
+    vi.spyOn(EmailTemplateModel, "find").mockReturnValue({
+      sort: vi.fn().mockReturnValue({
+        skip: vi.fn().mockReturnValue({
+          limit: vi.fn().mockReturnValue(mockExecResolved([template])),
+        }),
+      }),
+    } as never);
+    const findByIdSpy = vi
+      .spyOn(EmailTemplateModel, "findById")
+      .mockReturnValueOnce(mockExecResolved(template) as never)
+      .mockReturnValueOnce(mockExecResolved(template) as never)
+      .mockReturnValueOnce(mockExecResolved(template) as never)
+      .mockReturnValueOnce(mockExecResolved(null) as never);
+    vi.spyOn(template, "save").mockResolvedValue(template);
+    const deleteOneSpy = vi
+      .spyOn(EmailTemplateModel, "deleteOne")
+      .mockReturnValue(mockExecResolved({ acknowledged: true, deletedCount: 1 }) as never);
+
+    const actor = {
+      id: adminId.toString(),
+      email: "admin@example.com",
+      role: "admin",
+      tokenVersion: 0,
+    } as const;
+
+    const created = await adminService.createEmailTemplate(actor, {
+      templateName: "Welcome Template",
+      subjectLine: "Welcome",
+      content: "Hello {{name}}",
+    });
+    const listed = await adminService.listEmailTemplates({
+      page: 1,
+      limit: 20,
+      search: "welcome",
+    });
+    const fetched = await adminService.getEmailTemplateById({
+      templateId: templateId.toString(),
+    });
+    const updated = await adminService.updateEmailTemplate(
+      actor,
+      { templateId: templateId.toString() },
+      { templateName: "Updated Template", subjectLine: "Updated", content: "Updated content" },
+    );
+    const deleted = await adminService.deleteEmailTemplate({
+      templateId: templateId.toString(),
+    });
+
+    expect(created.templateName).toBe("Welcome Template");
+    expect(listed.data).toBeUndefined();
+    expect(listed.templates).toHaveLength(1);
+    expect(fetched.id).toBe(templateId.toString());
+    expect(updated.templateName).toBe("Updated Template");
+    expect(template.updatedBy.toString()).toBe(adminId.toString());
+    expect(deleteOneSpy).toHaveBeenCalledWith({ _id: templateId });
+    expect(deleted.message).toBe("Email template deleted successfully.");
+
+    findByIdSpy.mockReset();
+    findByIdSpy.mockReturnValue(mockExecResolved(template) as never);
+    existsSpy.mockReset();
+    existsSpy.mockReturnValueOnce(mockExecResolved({ _id: new Types.ObjectId() }) as never);
+    await expect(
+      adminService.updateEmailTemplate(
+        actor,
+        { templateId: templateId.toString() },
+        { templateName: "Duplicate Name" },
+      ),
+    ).rejects.toMatchObject({
+      code: "EMAIL_TEMPLATE_ALREADY_EXISTS",
+    });
+
+    findByIdSpy.mockReset();
+    findByIdSpy.mockReturnValue(mockExecResolved(null) as never);
+    await expect(
+      adminService.getEmailTemplateById({
+        templateId: templateId.toString(),
+      }),
+    ).rejects.toMatchObject({
+      code: "EMAIL_TEMPLATE_NOT_FOUND",
+    });
   });
 
   it("returns empty pagination metadata when no users match", async () => {
@@ -228,7 +510,13 @@ describe("admin service", () => {
       });
     });
 
-    const result = await adminService.createAdminUser({
+    const actor = {
+      id: new Types.ObjectId().toString(),
+      email: "super@example.com",
+      role: "super_admin",
+    } as const;
+
+    const result = await adminService.createAdminUser(actor, {
       name: "Admin User",
       email: "ADMIN@EXAMPLE.COM",
       password: "Password1",
@@ -248,9 +536,18 @@ describe("admin service", () => {
     expect(await bcrypt.compare("Password1", createPayload.passwordHash)).toBe(true);
     expect(result.role).toBe("admin");
     expect(result).not.toHaveProperty("passwordHash");
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: actor.id,
+        action: "admin_user_created",
+        actorType: "admin",
+        targetType: "user",
+        targetLabel: "admin@example.com",
+      }),
+    );
 
     await expect(
-      adminService.createAdminUser({
+      adminService.createAdminUser(actor, {
         name: "Admin User",
         email: "admin@example.com",
         password: "Password1",
@@ -309,7 +606,13 @@ describe("admin service", () => {
       .mockReturnValueOnce(mockExecResolved([users[0]]) as never)
       .mockReturnValueOnce(mockExecResolved(users) as never);
 
-    const result = await adminService.sendBulkEmail({
+    const actor = {
+      id: new Types.ObjectId().toString(),
+      email: "admin@example.com",
+      role: "admin",
+    } as const;
+
+    const result = await adminService.sendBulkEmail(actor, {
       userIds: [firstUserId.toString(), secondUserId.toString(), firstUserId.toString()],
       subject: "Notice",
       message: "Hello there",
@@ -328,9 +631,18 @@ describe("admin service", () => {
       2,
       expect.objectContaining({ to: "user2@example.com" }),
     );
+    expect(createAuditLogMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: actor.id,
+        action: "admin_bulk_email_sent",
+        actorType: "admin",
+        targetType: "bulk_email",
+        targetLabel: "Notice",
+      }),
+    );
 
     await expect(
-      adminService.sendBulkEmail({
+      adminService.sendBulkEmail(actor, {
         userIds: [firstUserId.toString(), secondUserId.toString()],
         subject: "Notice",
         message: "Hello there",
@@ -342,7 +654,7 @@ describe("admin service", () => {
     sendTransactionalEmailMock.mockRejectedValueOnce(new Error("smtp failed"));
 
     await expect(
-      adminService.sendBulkEmail({
+      adminService.sendBulkEmail(actor, {
         userIds: [firstUserId.toString(), secondUserId.toString()],
         subject: "Notice",
         message: "Hello there",

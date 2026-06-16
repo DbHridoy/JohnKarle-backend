@@ -9,10 +9,16 @@ process.env.LOG_LEVEL = "silent";
 
 const verifyTokenMock = vi.fn();
 const getDashboardMetricsMock = vi.fn();
+const listRecentActivitiesMock = vi.fn();
 const listAdminUsersMock = vi.fn();
 const getAdminUserByIdMock = vi.fn();
 const createAdminUserMock = vi.fn();
 const sendBulkEmailMock = vi.fn();
+const createEmailTemplateMock = vi.fn();
+const listEmailTemplatesMock = vi.fn();
+const getEmailTemplateByIdMock = vi.fn();
+const updateEmailTemplateMock = vi.fn();
+const deleteEmailTemplateMock = vi.fn();
 const getAdminProfileMock = vi.fn();
 const updateAdminProfileMock = vi.fn();
 const changeAdminPasswordMock = vi.fn();
@@ -30,10 +36,16 @@ vi.mock("../src/modules/legacy-access/legacy-access.activity.js", () => ({
 
 vi.mock("../src/modules/admin/admin.service.js", () => ({
   getDashboardMetrics: getDashboardMetricsMock,
+  listRecentActivities: listRecentActivitiesMock,
   listAdminUsers: listAdminUsersMock,
   getAdminUserById: getAdminUserByIdMock,
   createAdminUser: createAdminUserMock,
   sendBulkEmail: sendBulkEmailMock,
+  createEmailTemplate: createEmailTemplateMock,
+  listEmailTemplates: listEmailTemplatesMock,
+  getEmailTemplateById: getEmailTemplateByIdMock,
+  updateEmailTemplate: updateEmailTemplateMock,
+  deleteEmailTemplate: deleteEmailTemplateMock,
   getAdminProfile: getAdminProfileMock,
   updateAdminProfile: updateAdminProfileMock,
   changeAdminPassword: changeAdminPasswordMock,
@@ -119,6 +131,17 @@ describe("admin routes", () => {
       totalUsers: 10,
       totalActiveProfiles: 4,
     });
+    listRecentActivitiesMock.mockResolvedValue({
+      activities: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
     listAdminUsersMock.mockResolvedValue({
       users: [],
       pagination: {
@@ -167,6 +190,50 @@ describe("admin routes", () => {
     sendBulkEmailMock.mockResolvedValue({
       requestedCount: 1,
       sentCount: 1,
+    });
+    createEmailTemplateMock.mockResolvedValue({
+      id: "507f1f77bcf86cd799439111",
+      templateName: "Welcome Template",
+      subjectLine: "Welcome",
+      content: "Hello {{name}}",
+      createdBy: "507f1f77bcf86cd799439011",
+      updatedBy: "507f1f77bcf86cd799439011",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    listEmailTemplatesMock.mockResolvedValue({
+      templates: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
+    getEmailTemplateByIdMock.mockResolvedValue({
+      id: "507f1f77bcf86cd799439111",
+      templateName: "Welcome Template",
+      subjectLine: "Welcome",
+      content: "Hello {{name}}",
+      createdBy: "507f1f77bcf86cd799439011",
+      updatedBy: "507f1f77bcf86cd799439011",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    updateEmailTemplateMock.mockResolvedValue({
+      id: "507f1f77bcf86cd799439111",
+      templateName: "Updated Template",
+      subjectLine: "Updated subject",
+      content: "Updated content",
+      createdBy: "507f1f77bcf86cd799439011",
+      updatedBy: "507f1f77bcf86cd799439011",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    deleteEmailTemplateMock.mockResolvedValue({
+      message: "Email template deleted successfully.",
     });
     getAdminProfileMock.mockResolvedValue({
       id: "507f1f77bcf86cd799439011",
@@ -265,6 +332,121 @@ describe("admin routes", () => {
         totalUsers: 10,
         totalActiveProfiles: 4,
       },
+    });
+  });
+
+  it("rejects unauthenticated recent activity requests", async () => {
+    const response = await request(app).get("/api/v1/admin/dashboard/recent-activities");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Authentication token is required.",
+    });
+  });
+
+  it("rejects normal users from recent activities route", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/dashboard/recent-activities")
+      .set(authHeadersFor("user-token"));
+
+    expect(response.status).toBe(403);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "You do not have permission to access this resource.",
+    });
+  });
+
+  it("allows admins to fetch recent activities with validated defaults", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/dashboard/recent-activities")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(200);
+    expect(listRecentActivitiesMock).toHaveBeenCalledWith({
+      page: 1,
+      limit: 20,
+    });
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Recent activities fetched successfully.",
+      data: [],
+      meta: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    });
+  });
+
+  it("allows super admins to fetch recent activities with filters", async () => {
+    listRecentActivitiesMock.mockResolvedValueOnce({
+      activities: [
+        {
+          id: "507f1f77bcf86cd799439020",
+          type: "trusted_contact_added",
+          message: "Trusted contact added",
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      pagination: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: true,
+      },
+    });
+
+    const response = await request(app)
+      .get(
+        "/api/v1/admin/dashboard/recent-activities?page=2&limit=10&type=trusted_contact_added&actorId=507f1f77bcf86cd799439011&targetType=trusted_contact&targetId=507f1f77bcf86cd799439021&from=2026-01-01T00:00:00.000Z&to=2026-12-31T23:59:59.999Z&search=admin",
+      )
+      .set(authHeadersFor("super-token"));
+
+    expect(response.status).toBe(200);
+    expect(listRecentActivitiesMock).toHaveBeenCalledWith({
+      page: 2,
+      limit: 10,
+      type: "trusted_contact_added",
+      actorId: "507f1f77bcf86cd799439011",
+      targetType: "trusted_contact",
+      targetId: "507f1f77bcf86cd799439021",
+      from: new Date("2026-01-01T00:00:00.000Z"),
+      to: new Date("2026-12-31T23:59:59.999Z"),
+      search: "admin",
+    });
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Recent activities fetched successfully.",
+      data: [
+        {
+          type: "trusted_contact_added",
+          message: "Trusted contact added",
+        },
+      ],
+      meta: {
+        page: 2,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+      },
+    });
+  });
+
+  it("validates recent activity query params", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/dashboard/recent-activities?limit=101&actorId=bad-id")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
     });
   });
 
@@ -460,6 +642,101 @@ describe("admin routes", () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toMatchObject({
+      success: false,
+      message: "Validation failed",
+    });
+  });
+
+  it("allows admins to create email templates", async () => {
+    const response = await request(app)
+      .post("/api/v1/admin/email-templates")
+      .set(authHeadersFor("admin-token"))
+      .send({
+        templateName: "Welcome Template",
+        subjectLine: "Welcome",
+        content: "Hello {{name}}",
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Email template created successfully.",
+      data: {
+        templateName: "Welcome Template",
+        subjectLine: "Welcome",
+      },
+    });
+  });
+
+  it("lists email templates with validated defaults", async () => {
+    const response = await request(app)
+      .get("/api/v1/admin/email-templates")
+      .set(authHeadersFor("admin-token"));
+
+    expect(response.status).toBe(200);
+    expect(listEmailTemplatesMock).toHaveBeenCalledWith({
+      page: 1,
+      limit: 20,
+    });
+    expect(response.body).toMatchObject({
+      success: true,
+      message: "Email templates fetched successfully.",
+      data: [],
+      meta: {
+        page: 1,
+        limit: 20,
+        total: 0,
+      },
+    });
+  });
+
+  it("gets, updates, and deletes an email template", async () => {
+    const templateId = "507f1f77bcf86cd799439111";
+
+    const getResponse = await request(app)
+      .get(`/api/v1/admin/email-templates/${templateId}`)
+      .set(authHeadersFor("admin-token"));
+    const updateResponse = await request(app)
+      .patch(`/api/v1/admin/email-templates/${templateId}`)
+      .set(authHeadersFor("admin-token"))
+      .send({ subjectLine: "Updated subject" });
+    const deleteResponse = await request(app)
+      .delete(`/api/v1/admin/email-templates/${templateId}`)
+      .set(authHeadersFor("admin-token"));
+
+    expect(getResponse.status).toBe(200);
+    expect(getResponse.body).toMatchObject({
+      success: true,
+      message: "Email template fetched successfully.",
+    });
+    expect(updateResponse.status).toBe(200);
+    expect(updateResponse.body).toMatchObject({
+      success: true,
+      message: "Email template updated successfully.",
+    });
+    expect(deleteResponse.status).toBe(200);
+    expect(deleteResponse.body).toMatchObject({
+      success: true,
+      message: "Email template deleted successfully.",
+    });
+  });
+
+  it("validates email template identifiers and payloads", async () => {
+    const invalidIdResponse = await request(app)
+      .get("/api/v1/admin/email-templates/not-an-id")
+      .set(authHeadersFor("admin-token"));
+    const invalidBodyResponse = await request(app)
+      .post("/api/v1/admin/email-templates")
+      .set(authHeadersFor("admin-token"))
+      .send({
+        templateName: "",
+        subjectLine: "",
+        content: "",
+      });
+
+    expect(invalidIdResponse.status).toBe(400);
+    expect(invalidBodyResponse.status).toBe(400);
+    expect(invalidBodyResponse.body).toMatchObject({
       success: false,
       message: "Validation failed",
     });

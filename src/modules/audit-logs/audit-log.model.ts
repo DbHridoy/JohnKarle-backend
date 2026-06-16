@@ -9,6 +9,9 @@ export type AuditLog = {
   userId: Types.ObjectId;
   actorId?: Types.ObjectId;
   actorType: AuditActorType;
+  targetType?: string;
+  targetId?: string;
+  targetLabel?: string;
   action: string;
   metadata: Record<string, unknown>;
   ipAddress?: string;
@@ -38,6 +41,23 @@ const auditLogSchema = new Schema<AuditLog, AuditLogModel>(
       enum: auditActorTypes,
       required: true,
       index: true,
+    },
+    targetType: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      index: true,
+    },
+    targetId: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      index: true,
+    },
+    targetLabel: {
+      type: String,
+      trim: true,
+      maxlength: 200,
     },
     action: {
       type: String,
@@ -69,6 +89,10 @@ const auditLogSchema = new Schema<AuditLog, AuditLogModel>(
 );
 
 auditLogSchema.index({ userId: 1, createdAt: -1 });
+auditLogSchema.index({ createdAt: -1 });
+auditLogSchema.index({ actorId: 1, createdAt: -1 });
+auditLogSchema.index({ action: 1, createdAt: -1 });
+auditLogSchema.index({ targetType: 1, targetId: 1, createdAt: -1 });
 
 export const AuditLogModel =
   mongoose.models.AuditLog ?? mongoose.model<AuditLog, AuditLogModel>("AuditLog", auditLogSchema);
